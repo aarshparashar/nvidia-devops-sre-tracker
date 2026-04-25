@@ -3,7 +3,7 @@ name: Autonomous NVIDIA SRE Tracker
 on:
   schedule:
     - cron: '30 6 * * *' # Runs every day at 06:30 UTC (12:00 PM IST)
-  workflow_dispatch: # Allows you to click a "Run" button manually
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -32,8 +32,8 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add jobs/ aggregated/ reports/
-          
+          git add jobs/ aggregated/ jobs_table.md
+
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
