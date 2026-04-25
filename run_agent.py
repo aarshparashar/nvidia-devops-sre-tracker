@@ -15,6 +15,8 @@ from google.genai import types
 SEARCH_URL = "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite?q=DevOps+SRE+Reliability+Platform+MLOps+Infrastructure"
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 API_KEY = os.environ.get("GEMINI_API_KEY")
+# Use the preview model id the API actually serves (gemini-3.1-pro alone returns 404).
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.1-pro-preview")
 
 HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -31,36 +33,38 @@ else:
     print("⚠️ GEMINI_API_KEY not found! AI enrichment will fail.")
     exit(1)
 
+
 def clean_html(raw_html):
     cleanr = re.compile('<.*?>')
     return re.sub(cleanr, '', raw_html)
 
+
 def fetch_deep_job_context(job_link):
     """Fetches full description by directly loading the job's public HTML page"""
     print(f"   ↳ Fetching deep context from: {job_link}")
-    
+
     try:
         resp = requests.get(job_link, headers=HEADERS, timeout=15)
         if resp.status_code == 200:
-            # The actual job description is usually loaded dynamically, 
+            # The actual job description is usually loaded dynamically,
             # but Workday embeds the core text in the initial JSON state for SEO!
             soup = BeautifulSoup(resp.text, 'html.parser')
-            
+
             # Extract standard metadata from the title tag
             title_text = soup.title.string if soup.title else "NVIDIA Job"
             title = title_text.split(" | ")[0].strip()
-            
+
             # Find the embedded JSON script tag Workday uses to hydrate the page
             script_tags = soup.find_all("script", {"type": "application/ld+json"})
             full_description = ""
-            location = "India" # Defaulting
-            
+            location = "India"  # Defaulting
+
             for script in script_tags:
                 try:
                     data = json.loads(script.string)
                     if "@type" in data and data["@type"] == "JobPosting":
                         full_description = clean_html(data.get("description", ""))
-                        
+
                         # Try to parse location from structured data
                         loc_data = data.get("jobLocation", {})
                         if isinstance(loc_data, dict):
@@ -79,36 +83,40 @@ def fetch_deep_job_context(job_link):
                 "link": job_link,
                 "location": location,
                 "date_posted": TODAY,
-                "full_description": full_description 
+                "full_description": full_description
             }
     except Exception as e:
         print(f"Failed to load {job_link}: {e}")
-    
+
     return None
+
 
 def scrape_nvidia_jobs():
     """Scrapes jobs by falling back to Google Search due to Workday's strict bot protections on their own site."""
     print("🔍 Searching for NVIDIA India DevOps/SRE jobs via external index...")
-    
-    # Workday is notoriously difficult to scrape directly. The most reliable way for an automated 
+
+    # Workday is notoriously difficult to scrape directly. The most reliable way for an automated
     # bot to find public Workday jobs is to query a search engine or use the structured API we tried earlier.
     # Since the API failed with 400s, let's use the Gemini AI itself to generate the initial job list!
-    
+
     # We will pass the scraping task directly to the AI!
-    return[] # We handle the generation entirely in the enrich step now
+    return []  # We handle the generation entirely in the enrich step now
+
 
 def enrich_with_ai():
-    """Uses Gemini 3.1 High Thinking with Google Search to dynamically FIND and ENRICH the jobs in one step!"""
-    print(f"🧠 Using Gemini 3.1 Pro with Live Search Grounding to find and analyze today's jobs...")
-    
+    """Uses Gemini 3.1 Pro Preview with Google Search to dynamically FIND and ENRICH the jobs in one step!"""
+    print(
+        f"🧠 Using {GEMINI_MODEL} with Live Search Grounding to find and analyze today's jobs..."
+    )
+
     prompt = f"""
-    You are an elite, autonomous SRE/DevOps Intelligence Agent. 
-    
-    TASK: Use Google Search to find the latest DevOps, Site Reliability Engineering, and Platform Engineering job postings at NVIDIA specifically located in INDIA. 
+    You are an elite, autonomous SRE/DevOps Intelligence Agent.
+
+    TASK: Use Google Search to find the latest DevOps, Site Reliability Engineering, and Platform Engineering job postings at NVIDIA specifically located in INDIA.
     Look for roles posted recently.
-    
+
     For every real, currently open NVIDIA job you find in India that matches these categories, you must analyze its requirements based on your search context.
-    
+
     Format the output as a STRICT JSON array of objects.
     EACH object must follow this exact structure:
     {{
@@ -127,44 +135,44 @@ def enrich_with_ai():
       ],
       "inferred_domain": "e.g., AI Infrastructure, GPU Cloud, Core Systems"
     }}
-    
+
     Output ONLY valid JSON. No markdown blocks. If you cannot find any recent jobs, output an empty array[].
     """
-    
+
     config = types.GenerateContentConfig(
-        temperature=0.2, 
-        response_mime_type="application/json", 
+        temperature=0.2,
+        response_mime_type="application/json",
         system_instruction="THINKING LEVEL: HIGH. You are a precise data extraction bot.",
         tools=[types.Tool(google_search=types.GoogleSearch())]
     )
-    
+
     try:
         response = client.models.generate_content(
-            model='gemini-3.1-pro',
+            model=GEMINI_MODEL,
             contents=prompt,
             config=config
         )
-        
-        clean_text = response.text.replace("```json", "").replace("```", "").strip()
-        jobs = json.loads(clean_text)
+        raw = (response.text or "").replace("```json", "").replace("```", "").strip()
+        jobs = json.loads(raw)
         print(f"✅ AI successfully found and processed {len(jobs)} jobs!")
         return jobs
     except Exception as e:
         print("Failed to parse AI response. Error:", e)
-        return[]
+        return []
+
 
 def update_reports(enriched_jobs):
     print("📝 Writing intelligent data to repository...")
-    
+
     with open(f"jobs/{TODAY}.json", "w") as f:
         json.dump(enriched_jobs, f, indent=2)
-        
+
     all_jobs_path = "aggregated/all_jobs.json"
-    existing_jobs =[]
+    existing_jobs = []
     if os.path.exists(all_jobs_path):
         with open(all_jobs_path, "r") as f:
             existing_jobs = json.load(f)
-            
+
     seen_links = {j["link"] for j in existing_jobs}
     for job in enriched_jobs:
         if job["link"] not in seen_links:
@@ -176,24 +184,25 @@ def update_reports(enriched_jobs):
             for ej in existing_jobs:
                 if ej["link"] == job["link"]:
                     ej["last_seen"] = TODAY
-                    ej["skills"] = job["skills"] 
-                    
+                    ej["skills"] = job["skills"]
+
     with open(all_jobs_path, "w") as f:
         json.dump(existing_jobs, f, indent=2)
 
-    md_content = f"# NVIDIA SRE & DevOps Tracker (India)\n*Powered by Gemini 3.1 Pro Live Search Grounding*\n*Last Updated: {TODAY}*\n\n"
+    md_content = f"# NVIDIA SRE & DevOps Tracker (India)\n*Powered by Gemini 3.1 Pro Preview + Live Search Grounding*\n*Last Updated: {TODAY}*\n\n"
     md_content += "| Title | Level | Core Skills | Location | Link |\n"
     md_content += "|---|---|---|---|---|\n"
-    
+
     existing_jobs.sort(key=lambda x: x.get("last_seen", ""), reverse=True)
-    
+
     for j in existing_jobs:
-        skill_names = [skill["name"] for skill in j.get("skills", [])][:4] 
+        skill_names = [skill["name"] for skill in j.get("skills", [])][:4]
         skills_preview = ", ".join(skill_names)
         md_content += f"| {j.get('title', 'N/A')} | {j.get('level', 'N/A')} | **{skills_preview}** | {j.get('location', 'India')} | [Apply]({j.get('link', '#')}) |\n"
-        
+
     with open("reports/jobs_table.md", "w") as f:
         f.write(md_content)
+
 
 if __name__ == "__main__":
     enriched_jobs = enrich_with_ai()
