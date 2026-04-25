@@ -9,16 +9,16 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Cloud Platforms (AWS/GCP/Azure/OCI)",
-        "description": "Extensive experience managing production environments, monitoring, and logging solutions on major cloud providers to shape the future of AI infrastructure."
-      },
-      {
         "name": "Kubernetes",
-        "description": "Advanced knowledge and practical experience in deploying and managing containerized AI workloads and optimizing infrastructure."
+        "description": "Deep Kubernetes expertise required to manage the Run:ai platform, merging GPU virtualization with Kubernetes-native capabilities."
       },
       {
-        "name": "Scripting (Python/Go/Bash)",
-        "description": "Developing automation and backend systems to deliver the best user experience and provide detailed access to workload performance metrics."
+        "name": "AWS / GCP / Azure / OCI",
+        "description": "Extensive experience with public cloud platforms to manage production environments and AI workloads."
+      },
+      {
+        "name": "Bash / Python / Go",
+        "description": "Scripting and backend software engineering capabilities used to optimize AI infrastructure and automate release processes."
       }
     ],
     "inferred_domain": "AI Infrastructure",
@@ -35,12 +35,16 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "High Performance Computing (HPC)",
-        "description": "Managing and ensuring the reliability of large-scale HPC clusters used for advanced AI and machine learning workloads."
+        "name": "Linux Administration",
+        "description": "Proficient in administering Centos/RHEL Linux distributions in a large, distributed environment."
       },
       {
-        "name": "Site Reliability Engineering",
-        "description": "Applying SRE principles to maintain high availability, optimize performance, and automate operations for HPC infrastructure."
+        "name": "Job Schedulers",
+        "description": "Extensive knowledge with job scheduler administration like IBM Spectrum LSF or SLURM for HPC workloads."
+      },
+      {
+        "name": "Python / UNIX Scripting",
+        "description": "Developing automation scripts to automate deployment, configuration management, and operational monitoring."
       }
     ],
     "inferred_domain": "High Performance Computing (HPC)",
