@@ -1,0 +1,50 @@
+[
+  {
+    "id": "i9j0k1l2",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Cloud Platforms (AWS/GCP/Azure/OCI)",
+        "description": "Extensive experience managing production environments, monitoring, and logging solutions on major cloud providers to shape the future of AI infrastructure."
+      },
+      {
+        "name": "Kubernetes",
+        "description": "Advanced knowledge and practical experience in deploying and managing containerized AI workloads and optimizing infrastructure."
+      },
+      {
+        "name": "Scripting (Python/Go/Bash)",
+        "description": "Developing automation and backend systems to deliver the best user experience and provide detailed access to workload performance metrics."
+      }
+    ],
+    "inferred_domain": "AI Infrastructure",
+    "first_seen": "2026-04-25",
+    "last_seen": "2026-04-25"
+  },
+  {
+    "id": "m3n4o5p6",
+    "title": "Senior Site Reliability Engineer - HPC",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---HPC_JR2015729",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "High Performance Computing (HPC)",
+        "description": "Managing and ensuring the reliability of large-scale HPC clusters used for advanced AI and machine learning workloads."
+      },
+      {
+        "name": "Site Reliability Engineering",
+        "description": "Applying SRE principles to maintain high availability, optimize performance, and automate operations for HPC infrastructure."
+      }
+    ],
+    "inferred_domain": "High Performance Computing (HPC)",
+    "first_seen": "2026-04-25",
+    "last_seen": "2026-04-25"
+  }
+]
