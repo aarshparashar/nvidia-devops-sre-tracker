@@ -1,0 +1,54 @@
+[
+  {
+    "id": "nv-devops-jr2012804",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Kubernetes",
+        "description": "Used for container orchestration and managing production environments, supported by at least 4 years of practical experience."
+      },
+      {
+        "name": "Python / Go",
+        "description": "Required for backend systems scripting, automation, and developing cloud-native products for complex customer environments."
+      },
+      {
+        "name": "AWS / GCP / Azure",
+        "description": "Essential for taking end-to-end ownership of cloud infrastructure spanning development to production systems."
+      }
+    ],
+    "inferred_domain": "Cloud Infrastructure / Run:AI Cloud-Native Products",
+    "first_seen": "2026-04-25",
+    "last_seen": "2026-04-25"
+  },
+  {
+    "id": "nv-sre-hpc-jr2015729",
+    "title": "Senior Site Reliability Engineer - HPC",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---HPC_JR2015729",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "LSF / SLURM / SGE",
+        "description": "Essential for managing job schedulers and workload/resource scheduling in a large-scale High-Performance Computing (HPC) environment."
+      },
+      {
+        "name": "Ansible / Puppet / Chef",
+        "description": "Used for cluster configuration management and developing automation scripts for deployment and operational monitoring."
+      },
+      {
+        "name": "Python / Bash / Perl",
+        "description": "Required for strong script-writing capabilities to maintain legacy automation scripts and develop solutions for complex computing resource management."
+      }
+    ],
+    "inferred_domain": "High-Performance Computing (HPC) / AI Factory",
+    "first_seen": "2026-04-25",
+    "last_seen": "2026-04-25"
+  }
+]
