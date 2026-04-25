@@ -1,0 +1,126 @@
+[
+  {
+    "id": "a7f3b2e1",
+    "title": "Senior Site Reliability Engineer",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-Site-Reliability-Engineer_JR2012758",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Kubernetes & Docker",
+        "description": "Used for containerization and orchestration of large-scale hybrid cloud systems that host NVIDIA's in-house CI offerings across heterogeneous devices."
+      },
+      {
+        "name": "Ansible, Chef, Puppet",
+        "description": "Required for infrastructure automation to identify and resolve operational inefficiencies within complex deployment platforms."
+      },
+      {
+        "name": "Jenkins & CI/CD",
+        "description": "Essential for architecting, implementing, and supporting resilient, end-to-end CI/CD pipelines using both open-source and NVIDIA proprietary software."
+      },
+      {
+        "name": "Monitoring (Prometheus, Grafana, ELK)",
+        "description": "Used to monitor critical high-performance, geo-distributed services and mine data to identify scaling and optimization opportunities."
+      }
+    ],
+    "inferred_domain": "CI Infrastructure / Hybrid Cloud"
+  },
+  {
+    "id": "c4d9f0a2",
+    "title": "Senior Site Reliability Engineer, HPC and LSF",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer--HPC-and-LSF_JR2002032",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "HPC Workload Schedulers (LSF)",
+        "description": "Crucial for managing and supporting complex computing resource schedulers in a large-scale High Performance Computing environment that powers silicon development."
+      },
+      {
+        "name": "Python & UNIX Scripting",
+        "description": "Used to develop automation scripts for deployment, configuration management, and extracting grid performance metrics for optimization."
+      },
+      {
+        "name": "Linux (CentOS/RHEL)",
+        "description": "Required for administering and performing comprehensive troubleshooting from bare metal to the application level in a distributed Linux environment."
+      }
+    ],
+    "inferred_domain": "Hardware Infrastructure Farm / Silicon Development"
+  },
+  {
+    "id": "e8b1c4d7",
+    "title": "Senior Site Reliability Engineer - Datacenter Automation",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Kubernetes & containerd",
+        "description": "Used to deploy and support end-to-end container management solutions for large scalable GPU clusters within the DGX Cloud."
+      },
+      {
+        "name": "Python, Golang, Java",
+        "description": "Required for programming sophisticated automations and AI-powered applications to maintain a massive infrastructure of 35,000+ hosts with minimal manual intervention."
+      },
+      {
+        "name": "Slurm & Open Stack",
+        "description": "Used for maintaining and scaling large on-premises cloud infrastructure applications and compute environments."
+      }
+    ],
+    "inferred_domain": "DGX Cloud / AI Infrastructure"
+  },
+  {
+    "id": "f2a5d8c9",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Kubernetes & Docker",
+        "description": "Used to design, implement, and maintain database-centric microservice architectures for manufacturing information systems."
+      },
+      {
+        "name": "Cloud Platforms (AWS, Azure, GCP)",
+        "description": "Required for automating infrastructure provisioning and configuration management using modern cloud technologies."
+      },
+      {
+        "name": "Database Technologies",
+        "description": "Used to implement and manage database solutions, ensuring high performance, scalability, and reliability for data analysis solutions."
+      }
+    ],
+    "inferred_domain": "Manufacturing Information Systems"
+  },
+  {
+    "id": "b6e3a1f4",
+    "title": "DevOps and Build Engineer - Compiler",
+    "level": "mid",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/DevOps-and-Build-Engineer---Compiler_JR2014232",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Build Tools (CMake, Bazel, GNU Make)",
+        "description": "Crucial for compiling and maintaining the build infrastructure for next-generation GPU compiler technologies used in deep learning and gaming."
+      },
+      {
+        "name": "Jenkins (Groovy) & GitLab CI/CD",
+        "description": "Used to develop and maintain robust CI/CD pipelines to ensure flawless integration and delivery of compiler software libraries and executables."
+      },
+      {
+        "name": "Docker & Kubernetes",
+        "description": "Implemented to manage containerization and orchestration tools to streamline development workflows for the compiler engineering team."
+      }
+    ],
+    "inferred_domain": "Compiler Technologies / AI Tools"
+  }
+]
