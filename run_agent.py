@@ -17,6 +17,8 @@ SEARCH_URL = "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSit
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.1-pro-preview")
+# If true, accept some live Workday pages that omit JobPosting in HTML (may re-admit bad links — use for debugging).
+JOB_VERIFY_RELAXED = os.environ.get("JOB_VERIFY_RELAXED", "").lower() in ("1", "true", "yes")
 
 HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -95,38 +97,79 @@ def _normalize_job_url(link: str) -> str:
     return link
 
 
-def verify_nvidia_job_url(url: str, timeout: int = 12) -> bool:
-    """True if URL looks like a live NVIDIA Workday posting (reduces hallucinated / stale links)."""
+def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str]:
+    """Return (ok, reason). reason is machine-readable for logs and audit JSON."""
     url = _normalize_job_url(url)
+    if not url:
+        return False, "empty_or_missing_link"
     if not url.startswith("https://"):
-        return False
+        return False, "not_https"
     host = urlparse(url).netloc.lower()
     if host != "nvidia.wd5.myworkdayjobs.com":
-        return False
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
-        if r.status_code != 200:
-            return False
-        # Real postings embed schema.org JobPosting; generic / error pages usually do not.
-        if "JobPosting" not in r.text and "jobPosting" not in r.text:
-            return False
-        return True
-    except requests.RequestException:
-        return False
+        return False, f"wrong_host:{host or 'none'}"
+
+    last_err = None
+    for attempt, tmo in enumerate((timeout, timeout + 6), start=1):
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=tmo, allow_redirects=True)
+            if r.status_code != 200:
+                return False, f"http_{r.status_code}"
+            text = r.text
+            has_posting = "JobPosting" in text or "jobPosting" in text
+            if has_posting:
+                return True, "ok_jobposting_in_html"
+            if JOB_VERIFY_RELAXED and len(text) > 8000 and "myworkdayjobs" in text.lower():
+                return True, "ok_relaxed_large_workday_page"
+            return False, "http_200_but_no_jobposting_schema"
+        except requests.RequestException as e:
+            last_err = f"request_error:{type(e).__name__}"
+            if attempt >= 2:
+                return False, last_err
+    return False, last_err or "request_failed"
 
 
-def filter_jobs_by_verified_links(jobs: list) -> list:
+def verify_nvidia_job_url(url: str, timeout: int = 12) -> bool:
+    return verify_nvidia_job_url_detail(url, timeout=timeout)[0]
+
+
+def _verify_one_link(link):
+    return verify_nvidia_job_url_detail(link)
+
+
+def filter_jobs_by_verified_links(jobs: list, *, stage: str = "filter") -> tuple[list, list[dict]]:
+    """Return (kept_jobs, rejected_rows) where each rejected row has title, link, reason."""
     if not jobs:
-        return []
+        return [], []
     links = [j.get("link") for j in jobs]
     max_workers = min(8, max(1, len(links)))
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
-        flags = list(ex.map(verify_nvidia_job_url, links))
-    kept = [j for j, ok in zip(jobs, flags) if ok]
-    dropped = len(jobs) - len(kept)
+        outcomes = list(ex.map(_verify_one_link, links))
+
+    kept = []
+    rejected = []
+    for j, (ok, reason) in zip(jobs, outcomes):
+        if ok:
+            kept.append(j)
+        else:
+            rejected.append({
+                "title": j.get("title", ""),
+                "link": j.get("link", ""),
+                "reason": reason,
+            })
+
+    dropped = len(rejected)
     if dropped:
-        print(f"   ↳ Dropped {dropped} job(s) whose Apply URL did not return a live Workday posting page.")
-    return kept
+        mode = "relaxed" if JOB_VERIFY_RELAXED else "strict"
+        print(
+            f"   ↳ URL check ({stage}, {mode}): kept {len(kept)}/{len(jobs)}; "
+            f"rejected {dropped} (see lines below and jobs/url_verification_audit_{TODAY}.json)."
+        )
+        for row in rejected:
+            t = (row.get("title") or "untitled")[:60]
+            u = (row.get("link") or "")[:100]
+            print(f"      — rejected: {t} | {u} | {row.get('reason')}")
+
+    return kept, rejected
 
 
 def scrape_nvidia_jobs():
@@ -193,7 +236,24 @@ def enrich_with_ai():
         return []
 
 
-def update_reports(enriched_jobs):
+def _write_url_verification_audit(after_ai: list[dict], for_markdown: list[dict]) -> None:
+    path = f"jobs/url_verification_audit_{TODAY}.json"
+    payload = {
+        "date": TODAY,
+        "strict_mode": not JOB_VERIFY_RELAXED,
+        "after_ai": {"rejected": after_ai},
+        "markdown_table": {"rejected": for_markdown},
+        "how_to_read": (
+            "Rejected rows failed automated checks: wrong host, non-200 HTTP, or no JobPosting JSON-LD in HTML. "
+            "Open each link in a browser; if it is a real job, the heuristic may be too strict — set JOB_VERIFY_RELAXED=1 "
+            "on one workflow run to compare, or relax verify_nvidia_job_url_detail in run_agent.py."
+        ),
+    }
+    with open(path, "w") as f:
+        json.dump(payload, f, indent=2)
+
+
+def update_reports(enriched_jobs, *, ai_url_rejections: list[dict] | None = None):
     print("📝 Writing intelligent data to repository...")
 
     with open(f"jobs/{TODAY}.json", "w") as f:
@@ -225,7 +285,9 @@ def update_reports(enriched_jobs):
     md_content += "| Title | Level | Core Skills | Location | Link |\n"
     md_content += "|---|---|---|---|---|\n"
 
-    rows_for_md = filter_jobs_by_verified_links(existing_jobs)
+    rows_for_md, rejected_md = filter_jobs_by_verified_links(
+        existing_jobs, stage="markdown_table"
+    )
     if len(rows_for_md) < len(existing_jobs):
         print(
             f"   ↳ jobs_table.md: {len(rows_for_md)}/{len(existing_jobs)} rows have verified Apply URLs."
@@ -240,14 +302,18 @@ def update_reports(enriched_jobs):
     with open("jobs_table.md", "w") as f:
         f.write(md_content)
 
+    _write_url_verification_audit(ai_url_rejections or [], rejected_md)
+
 
 if __name__ == "__main__":
     raw_jobs = enrich_with_ai()
     if not raw_jobs:
         print("⏭️ No jobs found today or AI search failed.")
     else:
-        verified_jobs = filter_jobs_by_verified_links(raw_jobs)
-        update_reports(verified_jobs)
+        verified_jobs, rejected_ai = filter_jobs_by_verified_links(
+            raw_jobs, stage="after_ai"
+        )
+        update_reports(verified_jobs, ai_url_rejections=rejected_ai)
         if verified_jobs:
             print("✅ Autonomous execution complete. Ready to push to GitHub!")
         else:
