@@ -3,6 +3,7 @@ import json
 import datetime
 import requests
 import re
+import concurrent.futures
 from google import genai
 from google.genai import types
 
@@ -13,14 +14,20 @@ SEARCH_KEYWORDS = "DevOps SRE Reliability Platform MLOps Infrastructure"
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
+# OPTIMIZATION 1: Real Browser Headers to bypass Workday Anti-Bot
+HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
+}
+
 for folder in ["jobs", "aggregated", "reports"]:
     os.makedirs(folder, exist_ok=True)
 
 # ==========================================
-# 🧠 AI CONFIGURATION (New google-genai SDK)
+# 🧠 AI CONFIGURATION
 # ==========================================
 if API_KEY:
-    # Initialize the new genai Client
     client = genai.Client(api_key=API_KEY)
 else:
     print("⚠️ GEMINI_API_KEY not found! AI enrichment will fail.")
@@ -31,11 +38,32 @@ def clean_html(raw_html):
     cleanr = re.compile('<.*?>')
     return re.sub(cleanr, '', raw_html)
 
+def fetch_deep_job_context(j):
+    """Fetches full description for a single job"""
+    external_path = j.get('externalPath')
+    public_link = f"https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite{external_path}"
+    detail_api_url = f"https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite{external_path}"
+    
+    print(f"   ↳ Fetching deep context: {j.get('title')}")
+    detail_resp = requests.get(detail_api_url, headers=HEADERS)
+    
+    full_description = ""
+    if detail_resp.status_code == 200:
+        raw_html = detail_resp.json().get('jobPostingInfo', {}).get('jobDescription', '')
+        full_description = clean_html(raw_html)
+
+    return {
+        "title": j.get("title", ""),
+        "link": public_link,
+        "location": j.get("locationsText", "India"),
+        "date_posted": j.get("postedOn", TODAY),
+        "full_description": full_description 
+    }
+
 def scrape_nvidia_jobs():
-    """Fetches jobs and deeply extracts FULL URL CONTEXT for each job"""
+    """Fetches jobs and deeply extracts FULL URL CONTEXT using Multithreading"""
     print(f"🔍 Scraping NVIDIA jobs using keywords: '{SEARCH_KEYWORDS}'...")
     
-    # Base search API
     search_url = "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
     payload = {
         "appliedFacets": {"locationCountry":["bc33aa3152ec42d4995f4791a106ed09"]}, # India
@@ -44,36 +72,23 @@ def scrape_nvidia_jobs():
         "searchText": SEARCH_KEYWORDS
     }
     
-    headers = {"Content-Type": "application/json", "Accept": "application/json"}
-    response = requests.post(search_url, json=payload, headers=headers)
+    response = requests.post(search_url, json=payload, headers=HEADERS)
     
+    # OPTIMIZATION 3: Better Error Logging
     if response.status_code != 200:
-        print("Failed to fetch job list.")
+        print(f"❌ Failed to fetch job list. HTTP Status: {response.status_code}")
+        print(f"Response text: {response.text}")
         return[]
     
     jobs_data = response.json().get("jobPostings", [])
-    extracted_jobs =[]
     
-    for j in jobs_data:
-        external_path = j.get('externalPath')
-        public_link = f"https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite{external_path}"
-        detail_api_url = f"https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite{external_path}"
-        
-        print(f"   ↳ Fetching deep URL context for: {j.get('title')}")
-        detail_resp = requests.get(detail_api_url, headers={"Accept": "application/json"})
-        
-        full_description = ""
-        if detail_resp.status_code == 200:
-            raw_html = detail_resp.json().get('jobPostingInfo', {}).get('jobDescription', '')
-            full_description = clean_html(raw_html)
+    if not jobs_data:
+        return[]
 
-        extracted_jobs.append({
-            "title": j.get("title", ""),
-            "link": public_link,
-            "location": j.get("locationsText", "India"),
-            "date_posted": j.get("postedOn", TODAY),
-            "full_description": full_description 
-        })
+    # OPTIMIZATION 2: Multithreading (Massive Speed Boost)
+    print(f"⚡ Found {len(jobs_data)} jobs. Fetching deep context concurrently...")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+        extracted_jobs = list(executor.map(fetch_deep_job_context, jobs_data))
         
     return extracted_jobs
 
@@ -113,7 +128,6 @@ def enrich_with_ai(raw_jobs):
     Output ONLY valid JSON. No markdown blocks.
     """
     
-    # Configure the request using the new `types.GenerateContentConfig`
     config = types.GenerateContentConfig(
         temperature=0.2, 
         response_mime_type="application/json", 
@@ -123,7 +137,6 @@ def enrich_with_ai(raw_jobs):
             "NVIDIA-specific technologies via Google Search if context is missing, and deduce "
             "the precise engineering requirements. Do not output generic summaries. Be hyper-specific."
         ),
-        # New syntax for Google Search tool integration!
         tools=[types.Tool(google_search=types.GoogleSearch())]
     )
     
@@ -134,7 +147,6 @@ def enrich_with_ai(raw_jobs):
             config=config
         )
         
-        # Parse output safely
         clean_text = response.text.replace("```json", "").replace("```", "").strip()
         return json.loads(clean_text)
     except Exception as e:
@@ -144,11 +156,9 @@ def enrich_with_ai(raw_jobs):
 def update_reports(enriched_jobs):
     print("📝 Writing intelligent data to repository...")
     
-    # 1. Save Daily Snapshot
     with open(f"jobs/{TODAY}.json", "w") as f:
         json.dump(enriched_jobs, f, indent=2)
         
-    # 2. Update Master List
     all_jobs_path = "aggregated/all_jobs.json"
     existing_jobs =[]
     if os.path.exists(all_jobs_path):
@@ -171,15 +181,17 @@ def update_reports(enriched_jobs):
     with open(all_jobs_path, "w") as f:
         json.dump(existing_jobs, f, indent=2)
 
-    # 3. Create High-Level Markdown Table
     md_content = f"# NVIDIA SRE & DevOps Tracker (India)\n*Powered by Gemini 3.1 Pro AI Intelligence*\n*Last Updated: {TODAY}*\n\n"
     md_content += "| Title | Level | Core Skills | Location | Link |\n"
     md_content += "|---|---|---|---|---|\n"
     
+    # Sort existing jobs to put the most recently seen ones at the top of the Markdown table
+    existing_jobs.sort(key=lambda x: x.get("last_seen", ""), reverse=True)
+    
     for j in existing_jobs:
         skill_names = [skill["name"] for skill in j.get("skills", [])][:4] 
         skills_preview = ", ".join(skill_names)
-        md_content += f"| {j.get('title')} | {j.get('level')} | **{skills_preview}** | {j.get('location')} | [Apply]({j.get('link')}) |\n"
+        md_content += f"| {j.get('title', 'N/A')} | {j.get('level', 'N/A')} | **{skills_preview}** | {j.get('location', 'India')} | [Apply]({j.get('link', '#')}) |\n"
         
     with open("reports/jobs_table.md", "w") as f:
         f.write(md_content)
