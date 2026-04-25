@@ -14,7 +14,6 @@ SEARCH_KEYWORDS = "DevOps SRE Reliability Platform MLOps Infrastructure"
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
-# OPTIMIZATION 1: Real Browser Headers to bypass Workday Anti-Bot
 HEADERS = {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -55,45 +54,49 @@ def fetch_deep_job_context(j):
     return {
         "title": j.get("title", ""),
         "link": public_link,
-        "location": j.get("locationsText", "India"),
+        "location": j.get("locationsText", ""),
         "date_posted": j.get("postedOn", TODAY),
         "full_description": full_description 
     }
 
 def scrape_nvidia_jobs():
-    """Fetches jobs and deeply extracts FULL URL CONTEXT using Multithreading"""
+    """Fetches jobs and filters for India locally to avoid Workday HTTP 400 errors"""
     print(f"🔍 Scraping NVIDIA jobs using keywords: '{SEARCH_KEYWORDS}'...")
     
     search_url = "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
+    
+    # Removed appliedFacets completely to prevent API rejection!
     payload = {
-        "appliedFacets": {"locationCountry":["bc33aa3152ec42d4995f4791a106ed09"]}, # India
-        "limit": 10,
+        "appliedFacets": {}, 
+        "limit": 50, # Increased limit to catch more results before filtering
         "offset": 0,
         "searchText": SEARCH_KEYWORDS
     }
     
     response = requests.post(search_url, json=payload, headers=HEADERS)
     
-    # OPTIMIZATION 3: Better Error Logging
     if response.status_code != 200:
         print(f"❌ Failed to fetch job list. HTTP Status: {response.status_code}")
         print(f"Response text: {response.text}")
-        return[]
+        return []
     
-    jobs_data = response.json().get("jobPostings", [])
+    all_jobs = response.json().get("jobPostings",[])
+    
+    # Python-level Filtering: Only keep jobs located in India
+    jobs_data =[j for j in all_jobs if "India" in j.get("locationsText", "")]
     
     if not jobs_data:
+        print("⏭️ No India-based jobs found for these keywords today.")
         return[]
 
-    # OPTIMIZATION 2: Multithreading (Massive Speed Boost)
-    print(f"⚡ Found {len(jobs_data)} jobs. Fetching deep context concurrently...")
+    print(f"⚡ Found {len(jobs_data)} India jobs. Fetching deep context concurrently...")
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         extracted_jobs = list(executor.map(fetch_deep_job_context, jobs_data))
         
     return extracted_jobs
 
 def enrich_with_ai(raw_jobs):
-    """Uses Gemini 3.1 High Thinking with the New GenAI SDK"""
+    """Uses Gemini 3.1 High Thinking"""
     if not raw_jobs:
         return[]
         
@@ -185,7 +188,6 @@ def update_reports(enriched_jobs):
     md_content += "| Title | Level | Core Skills | Location | Link |\n"
     md_content += "|---|---|---|---|---|\n"
     
-    # Sort existing jobs to put the most recently seen ones at the top of the Markdown table
     existing_jobs.sort(key=lambda x: x.get("last_seen", ""), reverse=True)
     
     for j in existing_jobs:
@@ -206,4 +208,4 @@ if __name__ == "__main__":
         else:
             print("⚠️ AI failed to return valid data.")
     else:
-        print("⏭️ No jobs found today.")
+        print("⏭️ Pipeline complete.")
