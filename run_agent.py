@@ -97,6 +97,30 @@ def _normalize_job_url(link: str) -> str:
     return link
 
 
+def _html_has_jobposting_schema(text: str) -> bool:
+    """Detect schema.org JobPosting in page (substring or parsed ld+json)."""
+    if "JobPosting" in text or "jobPosting" in text:
+        return True
+    try:
+        soup = BeautifulSoup(text, "html.parser")
+        for script in soup.find_all("script", {"type": "application/ld+json"}):
+            if not script.string or not script.string.strip():
+                continue
+            try:
+                data = json.loads(script.string)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(data, dict) and data.get("@type") == "JobPosting":
+                return True
+            if isinstance(data, list):
+                for item in data:
+                    if isinstance(item, dict) and item.get("@type") == "JobPosting":
+                        return True
+    except Exception:
+        pass
+    return False
+
+
 def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str]:
     """Return (ok, reason). reason is machine-readable for logs and audit JSON."""
     url = _normalize_job_url(url)
@@ -115,8 +139,7 @@ def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str
             if r.status_code != 200:
                 return False, f"http_{r.status_code}"
             text = r.text
-            has_posting = "JobPosting" in text or "jobPosting" in text
-            if has_posting:
+            if _html_has_jobposting_schema(text):
                 return True, "ok_jobposting_in_html"
             if JOB_VERIFY_RELAXED and len(text) > 8000 and "myworkdayjobs" in text.lower():
                 return True, "ok_relaxed_large_workday_page"
@@ -165,9 +188,11 @@ def filter_jobs_by_verified_links(jobs: list, *, stage: str = "filter") -> tuple
             f"rejected {dropped} (see lines below and jobs/url_verification_audit_{TODAY}.json)."
         )
         for row in rejected:
-            t = (row.get("title") or "untitled")[:60]
-            u = (row.get("link") or "")[:100]
-            print(f"      — rejected: {t} | {u} | {row.get('reason')}")
+            t = (row.get("title") or "untitled")[:72]
+            u = row.get("link") or ""
+            print(f"      — rejected: {t}")
+            print(f"        url: {u}")
+            print(f"        reason: {row.get('reason')}")
 
     return kept, rejected
 
