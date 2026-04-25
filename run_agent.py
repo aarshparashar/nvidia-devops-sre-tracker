@@ -15,7 +15,6 @@ from google.genai import types
 SEARCH_URL = "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite?q=DevOps+SRE+Reliability+Platform+MLOps+Infrastructure"
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 API_KEY = os.environ.get("GEMINI_API_KEY")
-# Use the preview model id the API actually serves (gemini-3.1-pro alone returns 404).
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.1-pro-preview")
 
 HEADERS = {
@@ -24,7 +23,7 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
 }
 
-for folder in ["jobs", "aggregated", "reports"]:
+for folder in ["jobs", "aggregated"]:
     os.makedirs(folder, exist_ok=True)
 
 if API_KEY:
@@ -46,18 +45,14 @@ def fetch_deep_job_context(job_link):
     try:
         resp = requests.get(job_link, headers=HEADERS, timeout=15)
         if resp.status_code == 200:
-            # The actual job description is usually loaded dynamically,
-            # but Workday embeds the core text in the initial JSON state for SEO!
             soup = BeautifulSoup(resp.text, 'html.parser')
 
-            # Extract standard metadata from the title tag
             title_text = soup.title.string if soup.title else "NVIDIA Job"
             title = title_text.split(" | ")[0].strip()
 
-            # Find the embedded JSON script tag Workday uses to hydrate the page
             script_tags = soup.find_all("script", {"type": "application/ld+json"})
             full_description = ""
-            location = "India"  # Defaulting
+            location = "India"
 
             for script in script_tags:
                 try:
@@ -65,7 +60,6 @@ def fetch_deep_job_context(job_link):
                     if "@type" in data and data["@type"] == "JobPosting":
                         full_description = clean_html(data.get("description", ""))
 
-                        # Try to parse location from structured data
                         loc_data = data.get("jobLocation", {})
                         if isinstance(loc_data, dict):
                             address = loc_data.get("address", {})
@@ -94,13 +88,7 @@ def fetch_deep_job_context(job_link):
 def scrape_nvidia_jobs():
     """Scrapes jobs by falling back to Google Search due to Workday's strict bot protections on their own site."""
     print("🔍 Searching for NVIDIA India DevOps/SRE jobs via external index...")
-
-    # Workday is notoriously difficult to scrape directly. The most reliable way for an automated
-    # bot to find public Workday jobs is to query a search engine or use the structured API we tried earlier.
-    # Since the API failed with 400s, let's use the Gemini AI itself to generate the initial job list!
-
-    # We will pass the scraping task directly to the AI!
-    return []  # We handle the generation entirely in the enrich step now
+    return []
 
 
 def enrich_with_ai():
@@ -200,7 +188,7 @@ def update_reports(enriched_jobs):
         skills_preview = ", ".join(skill_names)
         md_content += f"| {j.get('title', 'N/A')} | {j.get('level', 'N/A')} | **{skills_preview}** | {j.get('location', 'India')} | [Apply]({j.get('link', '#')}) |\n"
 
-    with open("reports/jobs_table.md", "w") as f:
+    with open("jobs_table.md", "w") as f:
         f.write(md_content)
 
 
