@@ -100,6 +100,24 @@ def _normalize_job_url(link: str) -> str:
     return link
 
 
+def _workday_posting_path_ok(url: str) -> bool:
+    """
+    Require a concrete job posting path, not the careers hub.
+    Valid: .../job/India-Pune/Some-Title_JR2012348
+    Invalid: .../NVIDIAExternalCareerSite or .../en-US/NVIDIAExternalCareerSite (no /job/..._JR)
+    """
+    u = _normalize_job_url(url)
+    if not u:
+        return False
+    try:
+        path = urlparse(u).path or ""
+    except Exception:
+        return False
+    if "/job/" not in path.lower():
+        return False
+    return bool(re.search(r"/job/.+_JR\d+", path, re.I))
+
+
 def _jsonld_type_is_jobposting(node: dict) -> bool:
     t = node.get("@type")
     if t == "JobPosting":
@@ -209,6 +227,8 @@ def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str
     host = urlparse(url).netloc.lower()
     if host != "nvidia.wd5.myworkdayjobs.com":
         return False, f"wrong_host:{host or 'none'}"
+    if not _workday_posting_path_ok(url):
+        return False, "url_not_concrete_job_detail"
 
     last_err = None
     for attempt, tmo in enumerate((timeout, timeout + 6), start=1):
@@ -216,14 +236,21 @@ def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str
             r = requests.get(url, headers=HEADERS, timeout=tmo, allow_redirects=True)
             if r.status_code != 200:
                 return False, f"http_{r.status_code}"
+            final_url = _normalize_job_url(getattr(r, "url", "") or url)
+            if not _workday_posting_path_ok(final_url):
+                return False, "redirect_lost_job_detail_path"
             text = r.text
             if _html_has_jobposting_schema(text):
                 return True, "ok_jobposting_in_html"
-            if JOB_VERIFY_RELAXED and len(text) > 8000 and "myworkdayjobs" in text.lower():
+            if (
+                JOB_VERIFY_RELAXED
+                and len(text) > 8000
+                and "myworkdayjobs" in text.lower()
+            ):
                 return True, "ok_relaxed_large_workday_page"
-            if _workday_detail_page_heuristic(url, text):
+            if _workday_detail_page_heuristic(final_url, text):
                 return True, "ok_workday_detail_heuristic"
-            if _requisition_id_echoes_in_body(url, text):
+            if _requisition_id_echoes_in_body(final_url, text):
                 return True, "ok_requisition_id_in_body"
             return False, "http_200_but_no_jobposting_schema"
         except requests.RequestException as e:
@@ -239,6 +266,34 @@ def verify_nvidia_job_url(url: str, timeout: int = 12) -> bool:
 
 def _verify_one_link(link):
     return verify_nvidia_job_url_detail(link)
+
+
+def drop_jobs_without_workday_job_path(jobs: list) -> tuple[list, list[dict]]:
+    """Remove hub/listing-only URLs before HTTP checks (saves time, blocks bad model output)."""
+    kept: list = []
+    dropped: list[dict] = []
+    for j in jobs:
+        link = j.get("link") or ""
+        if _workday_posting_path_ok(link):
+            kept.append(j)
+        else:
+            dropped.append(
+                {
+                    "title": j.get("title", ""),
+                    "link": link,
+                    "reason": "url_not_concrete_job_detail_prefilter",
+                }
+            )
+    if dropped:
+        print(
+            f"   ↳ Dropped {len(dropped)} job(s): link must be a concrete Workday posting "
+            f"(path must include /job/.../..._JR####), not the careers site root."
+        )
+        for row in dropped:
+            t = (row.get("title") or "untitled")[:72]
+            print(f"      — shape-reject: {t}")
+            print(f"        url: {row.get('link') or ''}")
+    return kept, dropped
 
 
 def filter_jobs_by_verified_links(jobs: list, *, stage: str = "filter") -> tuple[list, list[dict]]:
@@ -356,7 +411,7 @@ def enrich_with_ai() -> tuple[list, str]:
       "level": "junior | mid | senior | manager",
       "category": "DevOps | SRE | Platform | MLOps",
       "location": "City, India",
-      "link": "ONLY a real, working https URL on nvidia.wd5.myworkdayjobs.com that you have seen in search results — never invent or guess requisition IDs",
+      "link": "ONLY a full job posting URL on nvidia.wd5.myworkdayjobs.com whose path contains /job/ and ends with _JR plus digits (e.g. .../job/India-Pune/Role-Title_JR2012348). Never use the careers hub root URL.",
       "date_scraped": "{TODAY}",
       "skills":[
         {{
@@ -582,10 +637,12 @@ if __name__ == "__main__":
             print("⏭️ AI response could not be parsed. Refreshing table from aggregate if available.")
         refresh_artifacts_after_ai_failure(ai_status=ai_status)
     else:
+        shaped, shape_rejected = drop_jobs_without_workday_job_path(raw_jobs)
         verified_jobs, rejected_ai = filter_jobs_by_verified_links(
-            raw_jobs, stage="after_ai"
+            shaped, stage="after_ai"
         )
-        update_reports(verified_jobs, ai_url_rejections=rejected_ai)
+        combined_rejections = shape_rejected + rejected_ai
+        update_reports(verified_jobs, ai_url_rejections=combined_rejections)
         if verified_jobs:
             print("✅ Autonomous execution complete. Ready to push to GitHub!")
         else:
