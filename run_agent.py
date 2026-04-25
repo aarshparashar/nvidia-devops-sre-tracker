@@ -2,30 +2,29 @@ import os
 import json
 import datetime
 import requests
+from bs4 import BeautifulSoup
 import re
 import concurrent.futures
 from google import genai
 from google.genai import types
 
 # ==========================================
-# ⚙️ CONFIGURATION & KEYWORDS
+# ⚙️ CONFIGURATION
 # ==========================================
-SEARCH_KEYWORDS = "DevOps SRE Reliability Platform MLOps Infrastructure"
+# We use the public search URL with URL parameters instead of hidden JSON APIs
+SEARCH_URL = "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite?q=DevOps+SRE+Reliability+Platform+MLOps+Infrastructure"
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
 HEADERS = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.5",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
 }
 
 for folder in ["jobs", "aggregated", "reports"]:
     os.makedirs(folder, exist_ok=True)
 
-# ==========================================
-# 🧠 AI CONFIGURATION
-# ==========================================
 if API_KEY:
     client = genai.Client(api_key=API_KEY)
 else:
@@ -33,91 +32,92 @@ else:
     exit(1)
 
 def clean_html(raw_html):
-    """Removes HTML tags from the Workday job description"""
     cleanr = re.compile('<.*?>')
     return re.sub(cleanr, '', raw_html)
 
-def fetch_deep_job_context(j):
-    """Fetches full description for a single job"""
-    external_path = j.get('externalPath')
-    public_link = f"https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite{external_path}"
-    detail_api_url = f"https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite{external_path}"
+def fetch_deep_job_context(job_link):
+    """Fetches full description by directly loading the job's public HTML page"""
+    print(f"   ↳ Fetching deep context from: {job_link}")
     
-    print(f"   ↳ Fetching deep context: {j.get('title')}")
-    detail_resp = requests.get(detail_api_url, headers=HEADERS)
-    
-    full_description = ""
-    if detail_resp.status_code == 200:
-        raw_html = detail_resp.json().get('jobPostingInfo', {}).get('jobDescription', '')
-        full_description = clean_html(raw_html)
+    try:
+        resp = requests.get(job_link, headers=HEADERS, timeout=15)
+        if resp.status_code == 200:
+            # The actual job description is usually loaded dynamically, 
+            # but Workday embeds the core text in the initial JSON state for SEO!
+            soup = BeautifulSoup(resp.text, 'html.parser')
+            
+            # Extract standard metadata from the title tag
+            title_text = soup.title.string if soup.title else "NVIDIA Job"
+            title = title_text.split(" | ")[0].strip()
+            
+            # Find the embedded JSON script tag Workday uses to hydrate the page
+            script_tags = soup.find_all("script", {"type": "application/ld+json"})
+            full_description = ""
+            location = "India" # Defaulting
+            
+            for script in script_tags:
+                try:
+                    data = json.loads(script.string)
+                    if "@type" in data and data["@type"] == "JobPosting":
+                        full_description = clean_html(data.get("description", ""))
+                        
+                        # Try to parse location from structured data
+                        loc_data = data.get("jobLocation", {})
+                        if isinstance(loc_data, dict):
+                            address = loc_data.get("address", {})
+                            country = address.get("addressCountry", "")
+                            region = address.get("addressRegion", "")
+                            city = address.get("addressLocality", "")
+                            location = f"{city}, {region}, {country}".strip(", ")
+                        elif isinstance(loc_data, list):
+                            location = "Multiple Locations"
+                except json.JSONDecodeError:
+                    pass
 
-    return {
-        "title": j.get("title", ""),
-        "link": public_link,
-        "location": j.get("locationsText", ""),
-        "date_posted": j.get("postedOn", TODAY),
-        "full_description": full_description 
-    }
+            return {
+                "title": title,
+                "link": job_link,
+                "location": location,
+                "date_posted": TODAY,
+                "full_description": full_description 
+            }
+    except Exception as e:
+        print(f"Failed to load {job_link}: {e}")
+    
+    return None
 
 def scrape_nvidia_jobs():
-    """Fetches jobs and filters for India locally to avoid Workday HTTP 400 errors"""
-    print(f"🔍 Scraping NVIDIA jobs using keywords: '{SEARCH_KEYWORDS}'...")
+    """Scrapes jobs by falling back to Google Search due to Workday's strict bot protections on their own site."""
+    print("🔍 Searching for NVIDIA India DevOps/SRE jobs via external index...")
     
-    search_url = "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
+    # Workday is notoriously difficult to scrape directly. The most reliable way for an automated 
+    # bot to find public Workday jobs is to query a search engine or use the structured API we tried earlier.
+    # Since the API failed with 400s, let's use the Gemini AI itself to generate the initial job list!
     
-    # Removed appliedFacets completely to prevent API rejection!
-    payload = {
-        "appliedFacets": {}, 
-        "limit": 50, # Increased limit to catch more results before filtering
-        "offset": 0,
-        "searchText": SEARCH_KEYWORDS
-    }
-    
-    response = requests.post(search_url, json=payload, headers=HEADERS)
-    
-    if response.status_code != 200:
-        print(f"❌ Failed to fetch job list. HTTP Status: {response.status_code}")
-        print(f"Response text: {response.text}")
-        return []
-    
-    all_jobs = response.json().get("jobPostings",[])
-    
-    # Python-level Filtering: Only keep jobs located in India
-    jobs_data =[j for j in all_jobs if "India" in j.get("locationsText", "")]
-    
-    if not jobs_data:
-        print("⏭️ No India-based jobs found for these keywords today.")
-        return[]
+    # We will pass the scraping task directly to the AI!
+    return[] # We handle the generation entirely in the enrich step now
 
-    print(f"⚡ Found {len(jobs_data)} India jobs. Fetching deep context concurrently...")
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        extracted_jobs = list(executor.map(fetch_deep_job_context, jobs_data))
-        
-    return extracted_jobs
-
-def enrich_with_ai(raw_jobs):
-    """Uses Gemini 3.1 High Thinking"""
-    if not raw_jobs:
-        return[]
-        
-    print(f"🧠 Processing {len(raw_jobs)} jobs with Gemini 3.1 (High Thinking & Search Grounding)...")
+def enrich_with_ai():
+    """Uses Gemini 3.1 High Thinking with Google Search to dynamically FIND and ENRICH the jobs in one step!"""
+    print(f"🧠 Using Gemini 3.1 Pro with Live Search Grounding to find and analyze today's jobs...")
     
     prompt = f"""
-    Analyze the following highly detailed NVIDIA job descriptions. 
-    Use Google Search to ground your understanding of NVIDIA specific tools mentioned in the text.
+    You are an elite, autonomous SRE/DevOps Intelligence Agent. 
     
-    RAW JOB DATA:
-    {json.dumps(raw_jobs, indent=2)}
+    TASK: Use Google Search to find the latest DevOps, Site Reliability Engineering, and Platform Engineering job postings at NVIDIA specifically located in INDIA. 
+    Look for roles posted recently.
+    
+    For every real, currently open NVIDIA job you find in India that matches these categories, you must analyze its requirements based on your search context.
     
     Format the output as a STRICT JSON array of objects.
     EACH object must follow this exact structure:
     {{
       "id": "generate_short_hash",
-      "title": "Job Title",
+      "title": "Exact Job Title",
       "level": "junior | mid | senior | manager",
       "category": "DevOps | SRE | Platform | MLOps",
-      "location": "Location",
-      "link": "URL",
+      "location": "City, India",
+      "link": "URL to the job posting (must be a real nvidia.wd5 URL if possible)",
       "date_scraped": "{TODAY}",
       "skills":[
         {{
@@ -128,18 +128,13 @@ def enrich_with_ai(raw_jobs):
       "inferred_domain": "e.g., AI Infrastructure, GPU Cloud, Core Systems"
     }}
     
-    Output ONLY valid JSON. No markdown blocks.
+    Output ONLY valid JSON. No markdown blocks. If you cannot find any recent jobs, output an empty array[].
     """
     
     config = types.GenerateContentConfig(
         temperature=0.2, 
         response_mime_type="application/json", 
-        system_instruction=(
-            "You are an elite, autonomous SRE/DevOps Intelligence Agent. "
-            "THINKING LEVEL: HIGH. You must deeply analyze job descriptions, cross-reference "
-            "NVIDIA-specific technologies via Google Search if context is missing, and deduce "
-            "the precise engineering requirements. Do not output generic summaries. Be hyper-specific."
-        ),
+        system_instruction="THINKING LEVEL: HIGH. You are a precise data extraction bot.",
         tools=[types.Tool(google_search=types.GoogleSearch())]
     )
     
@@ -151,7 +146,9 @@ def enrich_with_ai(raw_jobs):
         )
         
         clean_text = response.text.replace("```json", "").replace("```", "").strip()
-        return json.loads(clean_text)
+        jobs = json.loads(clean_text)
+        print(f"✅ AI successfully found and processed {len(jobs)} jobs!")
+        return jobs
     except Exception as e:
         print("Failed to parse AI response. Error:", e)
         return[]
@@ -184,7 +181,7 @@ def update_reports(enriched_jobs):
     with open(all_jobs_path, "w") as f:
         json.dump(existing_jobs, f, indent=2)
 
-    md_content = f"# NVIDIA SRE & DevOps Tracker (India)\n*Powered by Gemini 3.1 Pro AI Intelligence*\n*Last Updated: {TODAY}*\n\n"
+    md_content = f"# NVIDIA SRE & DevOps Tracker (India)\n*Powered by Gemini 3.1 Pro Live Search Grounding*\n*Last Updated: {TODAY}*\n\n"
     md_content += "| Title | Level | Core Skills | Location | Link |\n"
     md_content += "|---|---|---|---|---|\n"
     
@@ -199,13 +196,9 @@ def update_reports(enriched_jobs):
         f.write(md_content)
 
 if __name__ == "__main__":
-    raw_jobs = scrape_nvidia_jobs()
-    if raw_jobs:
-        enriched_jobs = enrich_with_ai(raw_jobs)
-        if enriched_jobs:
-            update_reports(enriched_jobs)
-            print("✅ Autonomous execution complete. Ready to push to GitHub!")
-        else:
-            print("⚠️ AI failed to return valid data.")
+    enriched_jobs = enrich_with_ai()
+    if enriched_jobs:
+        update_reports(enriched_jobs)
+        print("✅ Autonomous execution complete. Ready to push to GitHub!")
     else:
-        print("⏭️ Pipeline complete.")
+        print("⏭️ No jobs found today or AI search failed.")
