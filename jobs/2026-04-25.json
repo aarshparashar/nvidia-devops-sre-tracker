@@ -1,50 +1,74 @@
 [
   {
-    "id": "nv-devops-pne-12804",
-    "title": "Senior DevOps Engineer",
+    "id": "nv_sre_dc_auto_blr",
+    "title": "Senior Site Reliability Engineer - Datacenter Automation",
     "level": "senior",
-    "category": "DevOps",
-    "location": "Pune, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
     "date_scraped": "2026-04-25",
     "skills": [
       {
         "name": "Kubernetes",
-        "description": "Deep Kubernetes expertise required to manage the Run:ai platform, merging GPU virtualization with Kubernetes-native capabilities."
+        "description": "Used as a core cluster management system to automate and scale large-scale distributed AI infrastructure independent of cloud providers."
       },
       {
-        "name": "AWS / GCP / Azure / OCI",
-        "description": "Extensive experience with public cloud platforms to manage production environments and AI workloads."
+        "name": "Python/Go",
+        "description": "Systems programming languages used to develop automation, health management capabilities, and observability tools for GPU assets."
       },
       {
-        "name": "Bash / Python / Go",
-        "description": "Scripting and backend software engineering capabilities used to optimize AI infrastructure and automate release processes."
+        "name": "Slurm",
+        "description": "Utilized for cluster management and job scheduling to ensure production AI clusters run reliably with maximum performance."
       }
     ],
-    "inferred_domain": "AI Infrastructure / Run:ai Platform"
+    "inferred_domain": "AI Infrastructure"
   },
   {
-    "id": "nv-sre-blr-15729",
-    "title": "Senior Site Reliability Engineer - HPC",
+    "id": "nv_sre_hpc_blr",
+    "title": "Senior Site Reliability Engineer, HPC and LSF",
     "level": "senior",
     "category": "SRE",
     "location": "Bengaluru, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---HPC_JR2015729",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer--HPC-and-LSF_JR2015729",
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Linux Administration",
-        "description": "Proficient in administering Centos/RHEL Linux distributions in a large, distributed environment."
+        "name": "Linux (CentOS/RHEL)",
+        "description": "Essential for administering and operating large, distributed compute clusters that power silicon development."
       },
       {
-        "name": "Job Schedulers",
-        "description": "Extensive knowledge with job scheduler administration like IBM Spectrum LSF or SLURM for HPC workloads."
+        "name": "Docker",
+        "description": "Container technology used to build and operate high-reliability, efficient compute clusters."
       },
       {
-        "name": "Python / UNIX Scripting",
-        "description": "Developing automation scripts to automate deployment, configuration management, and operational monitoring."
+        "name": "Python",
+        "description": "Used alongside UNIX scripting to drive foundational improvements and automation to enhance engineer productivity and eliminate reactive operational work."
       }
     ],
-    "inferred_domain": "High Performance Computing (HPC)"
+    "inferred_domain": "Hardware Infrastructure Farm / HPC"
+  },
+  {
+    "id": "nv_devops_pune",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Kubernetes",
+        "description": "Used to deploy and support end-to-end container management solutions and maintain sophisticated development, compute, and test environments."
+      },
+      {
+        "name": "Docker/containerd",
+        "description": "Core containerization technologies managed alongside Kubernetes for scaling operations in data centers."
+      },
+      {
+        "name": "Python/Golang",
+        "description": "Programming languages used to design and develop AI tools and sophisticated automations for maintaining 35,000+ hosts."
+      }
+    ],
+    "inferred_domain": "Software Infrastructure and Operations"
   }
 ]
