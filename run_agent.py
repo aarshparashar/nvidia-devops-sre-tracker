@@ -150,15 +150,15 @@ def _html_has_jobposting_schema(text: str) -> bool:
 
 def _workday_detail_page_heuristic(url: str, text: str) -> bool:
     """
-    GitHub Actions often gets a large Workday shell without ld+json JobPosting.
-    Accept only canonical job-detail URLs plus multiple in-page signals.
+    GitHub Actions often gets a Workday shell without ld+json JobPosting.
+    Accept canonical job-detail URLs plus enough generic job-page signals.
     """
     if not re.search(r"_JR\d+", url, re.I):
         return False
     path = (urlparse(url).path or "").lower()
     if "/job/" not in path:
         return False
-    if len(text) < 4500:
+    if len(text) < 2800:
         return False
     low = text.lower()
     if "myworkdayjobs" not in low:
@@ -173,8 +173,30 @@ def _workday_detail_page_heuristic(url: str, text: str) -> bool:
         "jobdescription",
         "similarjobs",
         "jobreqid",
+        "nvidiaexternalcareersite",
+        "instancedetails",
+        "jobfamilies",
+        "locations",
+        "questionnaire",
+        "posting",
+        "jobposting",
     )
-    return sum(1 for k in kws if k in low) >= 3
+    return sum(1 for k in kws if k in low) >= 2
+
+
+def _requisition_id_echoes_in_body(url: str, text: str) -> bool:
+    """Workday JSON often repeats the JR requisition id from the URL inside the HTML."""
+    m = re.search(r"_JR(\d+)", url, re.I)
+    if not m:
+        return False
+    rid = m.group(1)
+    low = text.lower()
+    if len(text) < 1800 or "myworkdayjobs" not in low:
+        return False
+    if "/job/" not in (urlparse(url).path or "").lower():
+        return False
+    # Prefer full token as used in URLs and JSON (avoid matching bare digits only).
+    return (f"jr{rid}" in low) or (f"_jr{rid}" in low) or (f"requisitionid" in low and rid in text)
 
 
 def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str]:
@@ -201,6 +223,8 @@ def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str
                 return True, "ok_relaxed_large_workday_page"
             if _workday_detail_page_heuristic(url, text):
                 return True, "ok_workday_detail_heuristic"
+            if _requisition_id_echoes_in_body(url, text):
+                return True, "ok_requisition_id_in_body"
             return False, "http_200_but_no_jobposting_schema"
         except requests.RequestException as e:
             last_err = f"request_error:{type(e).__name__}"
