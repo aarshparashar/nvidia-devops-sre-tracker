@@ -3,7 +3,8 @@ import json
 import datetime
 import requests
 import re
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 # ==========================================
 # ⚙️ CONFIGURATION & KEYWORDS
@@ -12,27 +13,15 @@ SEARCH_KEYWORDS = "DevOps SRE Reliability Platform MLOps Infrastructure"
 TODAY = datetime.datetime.now().strftime("%Y-%m-%d")
 API_KEY = os.environ.get("GEMINI_API_KEY")
 
-for folder in["jobs", "aggregated", "reports"]:
+for folder in ["jobs", "aggregated", "reports"]:
     os.makedirs(folder, exist_ok=True)
 
 # ==========================================
-# 🧠 AI CONFIGURATION (Gemini 3.1 + Grounding + High Thinking)
+# 🧠 AI CONFIGURATION (New google-genai SDK)
 # ==========================================
 if API_KEY:
-    genai.configure(api_key=API_KEY)
-    
-    # 1. Using Gemini 3.1 
-    # 2. Enabling Google Search Grounding natively via the tools parameter
-    model = genai.GenerativeModel(
-        model_name='gemini-3.1-pro', # Upgraded model
-        tools=[{"google_search": {}}], # Enables live web search grounding
-        system_instruction=(
-            "You are an elite, autonomous SRE/DevOps Intelligence Agent. "
-            "THINKING LEVEL: HIGH. You must deeply analyze job descriptions, cross-reference "
-            "NVIDIA-specific technologies via Google Search if context is missing, and deduce "
-            "the precise engineering requirements. Do not output generic summaries. Be hyper-specific."
-        )
-    )
+    # Initialize the new genai Client
+    client = genai.Client(api_key=API_KEY)
 else:
     print("⚠️ GEMINI_API_KEY not found! AI enrichment will fail.")
     exit(1)
@@ -50,7 +39,7 @@ def scrape_nvidia_jobs():
     search_url = "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs"
     payload = {
         "appliedFacets": {"locationCountry":["bc33aa3152ec42d4995f4791a106ed09"]}, # India
-        "limit": 10, # Kept smaller to allow deep context processing per run
+        "limit": 10,
         "offset": 0,
         "searchText": SEARCH_KEYWORDS
     }
@@ -65,7 +54,6 @@ def scrape_nvidia_jobs():
     jobs_data = response.json().get("jobPostings", [])
     extracted_jobs =[]
     
-    # DEEP EXTRACTION: Go into every single job URL to get the full description
     for j in jobs_data:
         external_path = j.get('externalPath')
         public_link = f"https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite{external_path}"
@@ -84,13 +72,13 @@ def scrape_nvidia_jobs():
             "link": public_link,
             "location": j.get("locationsText", "India"),
             "date_posted": j.get("postedOn", TODAY),
-            "full_description": full_description # Full URL context added!
+            "full_description": full_description 
         })
         
     return extracted_jobs
 
 def enrich_with_ai(raw_jobs):
-    """Uses Gemini 3.1 High Thinking to extract detailed skills from full descriptions"""
+    """Uses Gemini 3.1 High Thinking with the New GenAI SDK"""
     if not raw_jobs:
         return[]
         
@@ -98,7 +86,7 @@ def enrich_with_ai(raw_jobs):
     
     prompt = f"""
     Analyze the following highly detailed NVIDIA job descriptions. 
-    Use Google Search to ground your understanding of NVIDIA specific tools mentioned in the text (like DGX, Omniverse, NeMo, etc).
+    Use Google Search to ground your understanding of NVIDIA specific tools mentioned in the text.
     
     RAW JOB DATA:
     {json.dumps(raw_jobs, indent=2)}
@@ -116,7 +104,7 @@ def enrich_with_ai(raw_jobs):
       "skills":[
         {{
            "name": "Skill Name (e.g., Kubernetes)",
-           "description": "Deep, context-aware description of WHY this skill is used here. (e.g., 'Required to manage stateful GPU orchestration across on-prem DGX clusters.')"
+           "description": "Deep, context-aware description of WHY this skill is used here."
         }}
       ],
       "inferred_domain": "e.g., AI Infrastructure, GPU Cloud, Core Systems"
@@ -125,21 +113,32 @@ def enrich_with_ai(raw_jobs):
     Output ONLY valid JSON. No markdown blocks.
     """
     
-    # Using high thinking implies letting the model output its reasoning. 
-    # To force valid JSON while still "thinking", Gemini 3+ handles complex instruction tracking flawlessly.
-    generation_config = genai.types.GenerationConfig(
-        temperature=0.2, # Low temperature for logical, analytical extraction
-        response_mime_type="application/json", # Forces strict JSON generation
+    # Configure the request using the new `types.GenerateContentConfig`
+    config = types.GenerateContentConfig(
+        temperature=0.2, 
+        response_mime_type="application/json", 
+        system_instruction=(
+            "You are an elite, autonomous SRE/DevOps Intelligence Agent. "
+            "THINKING LEVEL: HIGH. You must deeply analyze job descriptions, cross-reference "
+            "NVIDIA-specific technologies via Google Search if context is missing, and deduce "
+            "the precise engineering requirements. Do not output generic summaries. Be hyper-specific."
+        ),
+        # New syntax for Google Search tool integration!
+        tools=[types.Tool(google_search=types.GoogleSearch())]
     )
     
-    response = model.generate_content(prompt, generation_config=generation_config)
-    
     try:
+        response = client.models.generate_content(
+            model='gemini-3.1-pro',
+            contents=prompt,
+            config=config
+        )
+        
+        # Parse output safely
         clean_text = response.text.replace("```json", "").replace("```", "").strip()
         return json.loads(clean_text)
     except Exception as e:
-        print("Failed to parse AI response. Raw output:", response.text)
-        print("Error:", e)
+        print("Failed to parse AI response. Error:", e)
         return[]
 
 def update_reports(enriched_jobs):
