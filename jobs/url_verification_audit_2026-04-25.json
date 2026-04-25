@@ -2,18 +2,7 @@
   "date": "2026-04-25",
   "strict_mode": true,
   "after_ai": {
-    "rejected": [
-      {
-        "title": "DevOps and Build Engineer - Compiler",
-        "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite",
-        "reason": "http_200_but_no_jobposting_schema"
-      },
-      {
-        "title": "GFN and NvApp DevOps Engineer",
-        "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite",
-        "reason": "http_200_but_no_jobposting_schema"
-      }
-    ]
+    "rejected": []
   },
   "markdown_table": {
     "rejected": []
