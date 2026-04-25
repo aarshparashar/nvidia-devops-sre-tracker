@@ -1,0 +1,70 @@
+[
+  {
+    "id": "a1b2c3d4",
+    "title": "Senior Site Reliability Engineer - Datacenter Automation",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Go / Python",
+        "description": "Used as systems programming languages to automate large-scale distributed systems and manage GPU asset provisioning."
+      },
+      {
+        "name": "Incident Management",
+        "description": "Required for evaluating system failures, conducting blameless postmortems, and improving services for production AI clusters."
+      }
+    ],
+    "inferred_domain": "AI Infrastructure"
+  },
+  {
+    "id": "e5f6g7h8",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Kubernetes",
+        "description": "Essential for containerization and orchestrating cloud-native products across complex customer environments."
+      },
+      {
+        "name": "Jenkins / CI/CD",
+        "description": "Used to architect, implement, and support end-to-end build and deployment pipelines for NVIDIA's proprietary software."
+      },
+      {
+        "name": "Ansible / Chef / Puppet",
+        "description": "Infrastructure automation tools required to manage sophisticated software systems and drive automation initiatives."
+      }
+    ],
+    "inferred_domain": "Core Systems"
+  },
+  {
+    "id": "i9j0k1l2",
+    "title": "Senior Platform Engineer",
+    "level": "senior",
+    "category": "Platform",
+    "location": "Remote, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/Remote---India/Senior-Platform-Engineer_JR2007808",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Terraform / CloudFormation",
+        "description": "Infrastructure as Code (IaC) tooling used to automate the provisioning and management of cloud resources securely."
+      },
+      {
+        "name": "Hashicorp Vault",
+        "description": "Secrets management tool utilized to safeguard cloud infrastructure and applications against security threats."
+      },
+      {
+        "name": "GitOps",
+        "description": "Methodology applied to streamline application delivery, decouple applications from infrastructure, and improve developer experience."
+      }
+    ],
+    "inferred_domain": "Product Security / Cloud Deployments"
+  }
+]
