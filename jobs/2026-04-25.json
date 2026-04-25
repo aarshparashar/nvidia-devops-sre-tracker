@@ -1,70 +1,98 @@
 [
   {
-    "id": "a1b2c3d4",
-    "title": "Senior Site Reliability Engineer - Datacenter Automation",
+    "id": "JR2012758",
+    "title": "Senior Site Reliability Engineer, AI Factory",
     "level": "senior",
     "category": "SRE",
-    "location": "Bengaluru, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-Site-Reliability-Engineer_JR2012758",
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Go / Python",
-        "description": "Used as systems programming languages to automate large-scale distributed systems and manage GPU asset provisioning."
+        "name": "Packer",
+        "description": "Used for developing QCOW2 images for bare-metal and virtualized GPU systems."
       },
       {
-        "name": "Incident Management",
-        "description": "Required for evaluating system failures, conducting blameless postmortems, and improving services for production AI clusters."
+        "name": "Datacenter Inventory Management (Netbox/Nautilus)",
+        "description": "Required for managing the hardware state, inventory, and lifecycle of large-scale GPU clusters."
+      },
+      {
+        "name": "BMS & Power Management",
+        "description": "Essential for managing power efficiency and cooling of high-density GPU fleets in the AI Factory."
       }
     ],
-    "inferred_domain": "AI Infrastructure"
+    "inferred_domain": "AI Factory, GPU Fleets, Datacenter Infrastructure"
   },
   {
-    "id": "e5f6g7h8",
+    "id": "JR2012804",
     "title": "Senior DevOps Engineer",
     "level": "senior",
     "category": "DevOps",
     "location": "Pune, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Kubernetes",
-        "description": "Essential for containerization and orchestrating cloud-native products across complex customer environments."
+        "name": "Kubernetes & Docker",
+        "description": "Used to design, implement, and maintain database-centric microservice architectures on cloud and on-premises."
       },
       {
-        "name": "Jenkins / CI/CD",
-        "description": "Used to architect, implement, and support end-to-end build and deployment pipelines for NVIDIA's proprietary software."
+        "name": "Terraform & Ansible",
+        "description": "Leveraged for infrastructure-as-code to automate provisioning and configuration management."
       },
       {
-        "name": "Ansible / Chef / Puppet",
-        "description": "Infrastructure automation tools required to manage sophisticated software systems and drive automation initiatives."
+        "name": "Relational & NoSQL Databases (PostgreSQL, MySQL, MongoDB)",
+        "description": "Core to the role for implementing and managing high-performance, scalable database solutions."
       }
     ],
-    "inferred_domain": "Core Systems"
+    "inferred_domain": "Software Infrastructure and Operations, Database-centric Microservices"
   },
   {
-    "id": "i9j0k1l2",
-    "title": "Senior Platform Engineer",
+    "id": "JR2011458",
+    "title": "Senior Site Reliability Engineer - Datacenter Automation",
     "level": "senior",
-    "category": "Platform",
-    "location": "Remote, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/Remote---India/Senior-Platform-Engineer_JR2007808",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Terraform / CloudFormation",
-        "description": "Infrastructure as Code (IaC) tooling used to automate the provisioning and management of cloud resources securely."
+        "name": "Incident Management & Observability",
+        "description": "Crucial for evaluating system failures, harnessing GPU hardware diagnostics, and ensuring industry-leading reliability."
       },
       {
-        "name": "Hashicorp Vault",
-        "description": "Secrets management tool utilized to safeguard cloud infrastructure and applications against security threats."
+        "name": "Automated Deployments",
+        "description": "Used to support custom software for GPU asset provisioning, configuration, and lifecycle management across cloud providers."
       },
       {
-        "name": "GitOps",
-        "description": "Methodology applied to streamline application delivery, decouple applications from infrastructure, and improve developer experience."
+        "name": "Telemetry & Monitoring",
+        "description": "Harnessing multiple data streams from cluster and network telemetry to maintain DGX Cloud health."
       }
     ],
-    "inferred_domain": "Product Security / Cloud Deployments"
+    "inferred_domain": "DGX Cloud, AI Infrastructure, Datacenter Automation"
+  },
+  {
+    "id": "JR2000510",
+    "title": "Senior Site Reliability Engineer - GPU Cloud",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---GPU-Cloud_JR2000510",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "GitLab CI/CD",
+        "description": "Required for crafting and maintaining pipelines to automate build, test, and deployment workflows for cloud operations."
+      },
+      {
+        "name": "Prometheus, Grafana, Datadog",
+        "description": "Used for monitoring system health, building dashboards, creating alerts, and producing operational reports."
+      },
+      {
+        "name": "Python",
+        "description": "Utilized for automation, data handling, and tool development to streamline operational workflows."
+      }
+    ],
+    "inferred_domain": "NGC Cloud, Global Business Operations"
   }
 ]
