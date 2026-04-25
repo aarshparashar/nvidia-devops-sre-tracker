@@ -2,7 +2,7 @@ name: Autonomous NVIDIA SRE Tracker
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs every day at Midnight UTC
+    - cron: '30 6 * * *' # Runs every day at 06:30 UTC (12:00 PM IST)
   workflow_dispatch: # Allows you to click a "Run" button manually
 
 permissions:
