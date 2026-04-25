@@ -1,0 +1,17 @@
+{
+  "date": "2026-04-25",
+  "strict_mode": true,
+  "after_ai": {
+    "rejected": [
+      {
+        "title": "Senior Site Reliability Engineer - Datacenter Automation",
+        "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
+        "reason": "http_200_but_no_jobposting_schema"
+      }
+    ]
+  },
+  "markdown_table": {
+    "rejected": []
+  },
+  "how_to_read": "Rejected rows failed automated checks: wrong host, non-200 HTTP, or no JobPosting JSON-LD in HTML. Open each link in a browser; if it is a real job, the heuristic may be too strict \u2014 set JOB_VERIFY_RELAXED=1 on one workflow run to compare, or relax verify_nvidia_job_url_detail in run_agent.py."
+}
