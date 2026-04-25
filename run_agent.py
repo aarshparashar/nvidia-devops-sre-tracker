@@ -1,6 +1,7 @@
 import os
 import json
 import datetime
+import time
 import requests
 from bs4 import BeautifulSoup
 import re
@@ -19,6 +20,8 @@ API_KEY = os.environ.get("GEMINI_API_KEY")
 GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.1-pro-preview")
 # If true, accept some live Workday pages that omit JobPosting in HTML (may re-admit bad links — use for debugging).
 JOB_VERIFY_RELAXED = os.environ.get("JOB_VERIFY_RELAXED", "").lower() in ("1", "true", "yes")
+# If set, do not call the API a second time when the first response parses as an empty job list [].
+GEMINI_SKIP_EMPTY_RETRY = os.environ.get("GEMINI_SKIP_EMPTY_RETRY", "").lower() in ("1", "true", "yes")
 
 HEADERS = {
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
@@ -252,13 +255,13 @@ def _log_generate_response_debug(response) -> None:
     print(f"   ↳ first_candidate.finish_reason: {fr!r}")
 
 
-def enrich_with_ai():
-    """Uses Gemini 3.1 Pro Preview with Google Search to dynamically FIND and ENRICH the jobs in one step!"""
+def enrich_with_ai() -> tuple[list, str]:
+    """Call Gemini + search. Returns (jobs, status) where status is ok | empty_list | empty_response | parse_error."""
     print(
         f"🧠 Using {GEMINI_MODEL} with Live Search Grounding to find and analyze today's jobs..."
     )
 
-    prompt = f"""
+    base_prompt = f"""
     You are an elite, autonomous SRE/DevOps Intelligence Agent.
 
     TASK: Use Google Search to find the latest DevOps, Site Reliability Engineering, and Platform Engineering job postings at NVIDIA specifically located in INDIA.
@@ -288,6 +291,17 @@ def enrich_with_ai():
     Output ONLY valid JSON. No markdown blocks. If you cannot find any recent jobs, output an empty array[].
     """
 
+    retry_nudge = """
+    FOLLOW-UP (only if your previous answer was []): Run additional searches, e.g.
+    site:nvidia.wd5.myworkdayjobs.com India (DevOps OR \"Site Reliability\" OR SRE OR Platform OR MLOps).
+    Include every open India role you can verify with a real nvidia.wd5.myworkdayjobs.com URL from search snippets.
+    Output [] only if you have confirmed there are zero matching open roles after those searches.
+    """
+
+    prompts: list[str] = [base_prompt]
+    if not GEMINI_SKIP_EMPTY_RETRY:
+        prompts.append(base_prompt + retry_nudge)
+
     config = types.GenerateContentConfig(
         temperature=0.2,
         response_mime_type="application/json",
@@ -295,29 +309,49 @@ def enrich_with_ai():
         tools=[types.Tool(google_search=types.GoogleSearch())]
     )
 
-    response = None
-    try:
-        response = client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            config=config
-        )
-        raw = _extract_model_text(response)
-        if not raw:
-            _log_generate_response_debug(response)
-            print("Failed to parse AI response. Error: empty_model_output")
-            return []
-        jobs = _parse_jobs_json(raw)
-        print(f"✅ AI successfully found and processed {len(jobs)} jobs!")
-        return jobs
-    except Exception as e:
-        if response is not None:
-            try:
+    for attempt_idx, prompt in enumerate(prompts):
+        response = None
+        try:
+            response = client.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt,
+                config=config
+            )
+            raw = _extract_model_text(response)
+            if not raw:
                 _log_generate_response_debug(response)
-            except Exception:
-                pass
-        print("Failed to parse AI response. Error:", e)
-        return []
+                print("Failed to parse AI response. Error: empty_model_output")
+                return [], "empty_response"
+            jobs = _parse_jobs_json(raw)
+            if jobs:
+                if attempt_idx > 0:
+                    print(f"✅ AI returned {len(jobs)} job(s) after one retry.")
+                else:
+                    print(f"✅ AI returned {len(jobs)} job(s).")
+                return jobs, "ok"
+            # Parsed OK but empty list
+            if attempt_idx < len(prompts) - 1:
+                print(
+                    "⚠️ AI returned a valid empty JSON array []. Retrying once with stronger search instructions "
+                    "(set GEMINI_SKIP_EMPTY_RETRY=1 to disable this extra API call)."
+                )
+                time.sleep(2)
+                continue
+            print(
+                "ℹ️ AI still returned [] after retry — treating as 'no matching listings found' for this run "
+                "(search grounding can be flaky; next scheduled run may differ)."
+            )
+            return [], "empty_list"
+        except Exception as e:
+            if response is not None:
+                try:
+                    _log_generate_response_debug(response)
+                except Exception:
+                    pass
+            print("Failed to parse AI response. Error:", e)
+            return [], "parse_error"
+
+    return [], "parse_error"
 
 
 def _write_url_verification_audit(
@@ -385,24 +419,42 @@ def _finalize_markdown_and_audit(
     )
 
 
-def refresh_artifacts_after_ai_failure() -> None:
-    """Ensure jobs_table.md exists for git; rebuild from aggregate when AI returns nothing parseable."""
-    print("📝 Rebuilding jobs_table.md from saved aggregate (AI step did not yield jobs)...")
+def refresh_artifacts_after_ai_failure(*, ai_status: str) -> None:
+    """Ensure jobs_table.md exists for git; rebuild from aggregate when AI returns no new rows."""
+    print(
+        "📝 Rebuilding jobs_table.md from saved aggregate (AI returned no job rows this run)..."
+    )
     all_jobs_path = "aggregated/all_jobs.json"
     existing_jobs: list = []
     if os.path.exists(all_jobs_path):
         with open(all_jobs_path, "r") as f:
             existing_jobs = json.load(f)
-    note = (
-        "*Run note: AI response was empty or not valid JSON; this table is from `aggregated/all_jobs.json` only.*"
-        if existing_jobs
-        else "*Run note: AI response was empty or not valid JSON, and there is no aggregate file yet.*"
-    )
+
+    if ai_status == "empty_list":
+        note = (
+            "*Run note: The model returned a valid empty list `[]` (no new rows this run). "
+            "Table below is from `aggregated/all_jobs.json` when present.*"
+            if existing_jobs
+            else "*Run note: The model returned `[]` and there is no aggregate file yet.*"
+        )
+    elif ai_status == "empty_response":
+        note = (
+            "*Run note: The model returned no text; table from `aggregated/all_jobs.json` only.*"
+            if existing_jobs
+            else "*Run note: Empty model response and no aggregate file yet.*"
+        )
+    else:
+        note = (
+            "*Run note: AI response could not be parsed as JSON; table from `aggregated/all_jobs.json` only.*"
+            if existing_jobs
+            else "*Run note: AI parse failed and there is no aggregate file yet.*"
+        )
+
     _finalize_markdown_and_audit(
         existing_jobs,
         ai_url_rejections=[],
         run_note=note,
-        audit_extra={"ai_parse_failed": True},
+        audit_extra={"ai_outcome": ai_status},
     )
 
 
@@ -438,10 +490,18 @@ def update_reports(enriched_jobs, *, ai_url_rejections: list[dict] | None = None
 
 
 if __name__ == "__main__":
-    raw_jobs = enrich_with_ai()
+    raw_jobs, ai_status = enrich_with_ai()
     if not raw_jobs:
-        print("⏭️ No jobs found today or AI search failed.")
-        refresh_artifacts_after_ai_failure()
+        if ai_status == "empty_list":
+            print(
+                "⏭️ No new job rows from AI this run (empty list). "
+                "Refreshing table from aggregate if available."
+            )
+        elif ai_status == "empty_response":
+            print("⏭️ Empty model output. Refreshing table from aggregate if available.")
+        else:
+            print("⏭️ AI response could not be parsed. Refreshing table from aggregate if available.")
+        refresh_artifacts_after_ai_failure(ai_status=ai_status)
     else:
         verified_jobs, rejected_ai = filter_jobs_by_verified_links(
             raw_jobs, stage="after_ai"
