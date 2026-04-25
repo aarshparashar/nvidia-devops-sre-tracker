@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import concurrent.futures
+from urllib.parse import urlparse
 from google import genai
 from google.genai import types
 
@@ -85,6 +86,49 @@ def fetch_deep_job_context(job_link):
     return None
 
 
+def _normalize_job_url(link: str) -> str:
+    if not link or not isinstance(link, str):
+        return ""
+    link = link.strip()
+    if link.startswith("//"):
+        link = "https:" + link
+    return link
+
+
+def verify_nvidia_job_url(url: str, timeout: int = 12) -> bool:
+    """True if URL looks like a live NVIDIA Workday posting (reduces hallucinated / stale links)."""
+    url = _normalize_job_url(url)
+    if not url.startswith("https://"):
+        return False
+    host = urlparse(url).netloc.lower()
+    if host != "nvidia.wd5.myworkdayjobs.com":
+        return False
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=timeout, allow_redirects=True)
+        if r.status_code != 200:
+            return False
+        # Real postings embed schema.org JobPosting; generic / error pages usually do not.
+        if "JobPosting" not in r.text and "jobPosting" not in r.text:
+            return False
+        return True
+    except requests.RequestException:
+        return False
+
+
+def filter_jobs_by_verified_links(jobs: list) -> list:
+    if not jobs:
+        return []
+    links = [j.get("link") for j in jobs]
+    max_workers = min(8, max(1, len(links)))
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as ex:
+        flags = list(ex.map(verify_nvidia_job_url, links))
+    kept = [j for j, ok in zip(jobs, flags) if ok]
+    dropped = len(jobs) - len(kept)
+    if dropped:
+        print(f"   ↳ Dropped {dropped} job(s) whose Apply URL did not return a live Workday posting page.")
+    return kept
+
+
 def scrape_nvidia_jobs():
     """Scrapes jobs by falling back to Google Search due to Workday's strict bot protections on their own site."""
     print("🔍 Searching for NVIDIA India DevOps/SRE jobs via external index...")
@@ -113,7 +157,7 @@ def enrich_with_ai():
       "level": "junior | mid | senior | manager",
       "category": "DevOps | SRE | Platform | MLOps",
       "location": "City, India",
-      "link": "URL to the job posting (must be a real nvidia.wd5 URL if possible)",
+      "link": "ONLY a real, working https URL on nvidia.wd5.myworkdayjobs.com that you have seen in search results — never invent or guess requisition IDs",
       "date_scraped": "{TODAY}",
       "skills":[
         {{
@@ -181,9 +225,14 @@ def update_reports(enriched_jobs):
     md_content += "| Title | Level | Core Skills | Location | Link |\n"
     md_content += "|---|---|---|---|---|\n"
 
-    existing_jobs.sort(key=lambda x: x.get("last_seen", ""), reverse=True)
+    rows_for_md = filter_jobs_by_verified_links(existing_jobs)
+    if len(rows_for_md) < len(existing_jobs):
+        print(
+            f"   ↳ jobs_table.md: {len(rows_for_md)}/{len(existing_jobs)} rows have verified Apply URLs."
+        )
+    rows_for_md.sort(key=lambda x: x.get("last_seen", ""), reverse=True)
 
-    for j in existing_jobs:
+    for j in rows_for_md:
         skill_names = [skill["name"] for skill in j.get("skills", [])][:4]
         skills_preview = ", ".join(skill_names)
         md_content += f"| {j.get('title', 'N/A')} | {j.get('level', 'N/A')} | **{skills_preview}** | {j.get('location', 'India')} | [Apply]({j.get('link', '#')}) |\n"
@@ -193,9 +242,15 @@ def update_reports(enriched_jobs):
 
 
 if __name__ == "__main__":
-    enriched_jobs = enrich_with_ai()
-    if enriched_jobs:
-        update_reports(enriched_jobs)
-        print("✅ Autonomous execution complete. Ready to push to GitHub!")
-    else:
+    raw_jobs = enrich_with_ai()
+    if not raw_jobs:
         print("⏭️ No jobs found today or AI search failed.")
+    else:
+        verified_jobs = filter_jobs_by_verified_links(raw_jobs)
+        update_reports(verified_jobs)
+        if verified_jobs:
+            print("✅ Autonomous execution complete. Ready to push to GitHub!")
+        else:
+            print(
+                "⏭️ No new jobs passed URL verification; aggregated data and jobs_table.md were still refreshed using live-link checks."
+            )
