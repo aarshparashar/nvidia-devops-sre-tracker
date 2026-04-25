@@ -100,6 +100,34 @@ def _normalize_job_url(link: str) -> str:
     return link
 
 
+def _jsonld_type_is_jobposting(node: dict) -> bool:
+    t = node.get("@type")
+    if t == "JobPosting":
+        return True
+    if isinstance(t, list):
+        return "JobPosting" in t
+    return False
+
+
+def _walk_jsonld_for_jobposting(data) -> bool:
+    if isinstance(data, dict):
+        if _jsonld_type_is_jobposting(data):
+            return True
+        graph = data.get("@graph")
+        if isinstance(graph, list):
+            for item in graph:
+                if _walk_jsonld_for_jobposting(item):
+                    return True
+        for v in data.values():
+            if isinstance(v, (dict, list)) and _walk_jsonld_for_jobposting(v):
+                return True
+    elif isinstance(data, list):
+        for item in data:
+            if _walk_jsonld_for_jobposting(item):
+                return True
+    return False
+
+
 def _html_has_jobposting_schema(text: str) -> bool:
     """Detect schema.org JobPosting in page (substring or parsed ld+json)."""
     if "JobPosting" in text or "jobPosting" in text:
@@ -113,15 +141,40 @@ def _html_has_jobposting_schema(text: str) -> bool:
                 data = json.loads(script.string)
             except json.JSONDecodeError:
                 continue
-            if isinstance(data, dict) and data.get("@type") == "JobPosting":
+            if _walk_jsonld_for_jobposting(data):
                 return True
-            if isinstance(data, list):
-                for item in data:
-                    if isinstance(item, dict) and item.get("@type") == "JobPosting":
-                        return True
     except Exception:
         pass
     return False
+
+
+def _workday_detail_page_heuristic(url: str, text: str) -> bool:
+    """
+    GitHub Actions often gets a large Workday shell without ld+json JobPosting.
+    Accept only canonical job-detail URLs plus multiple in-page signals.
+    """
+    if not re.search(r"_JR\d+", url, re.I):
+        return False
+    path = (urlparse(url).path or "").lower()
+    if "/job/" not in path:
+        return False
+    if len(text) < 4500:
+        return False
+    low = text.lower()
+    if "myworkdayjobs" not in low:
+        return False
+    kws = (
+        "requisitionid",
+        "jobpostinginfo",
+        "jobdetails",
+        "careersection",
+        "timeposted",
+        "bulletfields",
+        "jobdescription",
+        "similarjobs",
+        "jobreqid",
+    )
+    return sum(1 for k in kws if k in low) >= 3
 
 
 def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str]:
@@ -146,6 +199,8 @@ def verify_nvidia_job_url_detail(url: str, timeout: int = 12) -> tuple[bool, str
                 return True, "ok_jobposting_in_html"
             if JOB_VERIFY_RELAXED and len(text) > 8000 and "myworkdayjobs" in text.lower():
                 return True, "ok_relaxed_large_workday_page"
+            if _workday_detail_page_heuristic(url, text):
+                return True, "ok_workday_detail_heuristic"
             return False, "http_200_but_no_jobposting_schema"
         except requests.RequestException as e:
             last_err = f"request_error:{type(e).__name__}"
