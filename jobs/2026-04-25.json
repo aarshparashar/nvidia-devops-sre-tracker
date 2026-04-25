@@ -1,54 +1,6 @@
 [
   {
-    "id": "JR2012758",
-    "title": "Senior Site Reliability Engineer, AI Factory",
-    "level": "senior",
-    "category": "SRE",
-    "location": "Pune, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-Site-Reliability-Engineer_JR2012758",
-    "date_scraped": "2026-04-25",
-    "skills": [
-      {
-        "name": "Packer",
-        "description": "Used for developing QCOW2 images for bare-metal and virtualized GPU systems."
-      },
-      {
-        "name": "Datacenter Inventory Management (Netbox/Nautilus)",
-        "description": "Required for managing the hardware state, inventory, and lifecycle of large-scale GPU clusters."
-      },
-      {
-        "name": "BMS & Power Management",
-        "description": "Essential for managing power efficiency and cooling of high-density GPU fleets in the AI Factory."
-      }
-    ],
-    "inferred_domain": "AI Factory, GPU Fleets, Datacenter Infrastructure"
-  },
-  {
-    "id": "JR2012804",
-    "title": "Senior DevOps Engineer",
-    "level": "senior",
-    "category": "DevOps",
-    "location": "Pune, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
-    "date_scraped": "2026-04-25",
-    "skills": [
-      {
-        "name": "Kubernetes & Docker",
-        "description": "Used to design, implement, and maintain database-centric microservice architectures on cloud and on-premises."
-      },
-      {
-        "name": "Terraform & Ansible",
-        "description": "Leveraged for infrastructure-as-code to automate provisioning and configuration management."
-      },
-      {
-        "name": "Relational & NoSQL Databases (PostgreSQL, MySQL, MongoDB)",
-        "description": "Core to the role for implementing and managing high-performance, scalable database solutions."
-      }
-    ],
-    "inferred_domain": "Software Infrastructure and Operations, Database-centric Microservices"
-  },
-  {
-    "id": "JR2011458",
+    "id": "a8f4c2e9",
     "title": "Senior Site Reliability Engineer - Datacenter Automation",
     "level": "senior",
     "category": "SRE",
@@ -57,42 +9,134 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Incident Management & Observability",
-        "description": "Crucial for evaluating system failures, harnessing GPU hardware diagnostics, and ensuring industry-leading reliability."
+        "name": "Go / Python",
+        "description": "Used as systems programming languages to automate large-scale distributed systems and manage datacenter operations."
       },
       {
-        "name": "Automated Deployments",
-        "description": "Used to support custom software for GPU asset provisioning, configuration, and lifecycle management across cloud providers."
+        "name": "Site Reliability Engineering (SRE)",
+        "description": "Applied for reliability assessments, incident management, observability, monitoring, alerting, and toil elimination in AI infrastructure."
       },
       {
-        "name": "Telemetry & Monitoring",
-        "description": "Harnessing multiple data streams from cluster and network telemetry to maintain DGX Cloud health."
+        "name": "GPU Lifecycle Management",
+        "description": "Required for provisioning, configuring, and managing GPU assets across multiple cloud providers for DGX Cloud."
       }
     ],
-    "inferred_domain": "DGX Cloud, AI Infrastructure, Datacenter Automation"
+    "inferred_domain": "AI Infrastructure / DGX Cloud"
   },
   {
-    "id": "JR2000510",
-    "title": "Senior Site Reliability Engineer - GPU Cloud",
+    "id": "b3d7a1f4",
+    "title": "Senior DevOps Engineer",
     "level": "senior",
-    "category": "SRE",
-    "location": "Bengaluru, India",
-    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---GPU-Cloud_JR2000510",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "GitLab CI/CD",
-        "description": "Required for crafting and maintaining pipelines to automate build, test, and deployment workflows for cloud operations."
+        "name": "Kubernetes",
+        "description": "Advanced knowledge required to manage and orchestrate containerized workloads in large-scale production environments."
       },
       {
-        "name": "Prometheus, Grafana, Datadog",
-        "description": "Used for monitoring system health, building dashboards, creating alerts, and producing operational reports."
+        "name": "Cloud Platforms (AWS, GCP, Azure, OCI)",
+        "description": "Essential for managing production environments, deploying infrastructure, and implementing monitoring/logging solutions."
       },
       {
-        "name": "Python",
-        "description": "Utilized for automation, data handling, and tool development to streamline operational workflows."
+        "name": "Bash / Python / Go",
+        "description": "Used for extensive scripting and automation of backend systems and databases."
       }
     ],
-    "inferred_domain": "NGC Cloud, Global Business Operations"
+    "inferred_domain": "AI Infrastructure"
+  },
+  {
+    "id": "c9e2b5d8",
+    "title": "Senior Site Reliability Engineer",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-Site-Reliability-Engineer_JR2012758",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "CI/CD Systems",
+        "description": "Architecting and supporting end-to-end deployment pipelines using open-source and NVIDIA proprietary software."
+      },
+      {
+        "name": "Hybrid Cloud Systems",
+        "description": "Hosting and running large-scale hybrid cloud systems and services for in-house CI offerings."
+      },
+      {
+        "name": "Infrastructure Automation",
+        "description": "Designing complex automation platforms to identify and resolve operational inefficiencies across Geo-distributed systems."
+      }
+    ],
+    "inferred_domain": "Infrastructure, Planning and Processes (IPP)"
+  },
+  {
+    "id": "d4f1c8a3",
+    "title": "Senior Site Reliability Engineer - HPC",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---HPC_JR2015729",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "High-Performance Computing (HPC)",
+        "description": "Managing and scaling large-scale distributed systems and HPC environments."
+      },
+      {
+        "name": "Site Reliability Engineering",
+        "description": "Applying SRE principles to ensure the reliability and performance of AI and HPC infrastructure."
+      }
+    ],
+    "inferred_domain": "AI Infrastructure / HPC"
+  },
+  {
+    "id": "e5a9d2b6",
+    "title": "DevOps and Build Engineer - Compiler",
+    "level": "mid",
+    "category": "DevOps",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/DevOps-and-Build-Engineer---Compiler",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "CI/CD Pipelines",
+        "description": "Developing and maintaining robust pipelines to ensure flawless integration and delivery of compiler software."
+      },
+      {
+        "name": "Build Tools (Make, CMake, Bazel)",
+        "description": "Enhancing the efficiency and reliability of build systems for the next generation of compiler technologies."
+      },
+      {
+        "name": "Docker & Kubernetes",
+        "description": "Containerizing build environments and orchestrating them for scalable software delivery."
+      }
+    ],
+    "inferred_domain": "Compiler Technologies"
+  },
+  {
+    "id": "f6b3e7c1",
+    "title": "Senior Platform and EngOps Engineer - Cluster Operations",
+    "level": "senior",
+    "category": "Platform",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Platform-and-EngOps-Engineer---Cluster-Operations",
+    "date_scraped": "2026-04-25",
+    "skills": [
+      {
+        "name": "Ansible, Python, Shell",
+        "description": "Used to develop automated tools to efficiently deploy, provision, and maintain extensive GPU clusters."
+      },
+      {
+        "name": "NVLink and InfiniBand",
+        "description": "Managing and maintaining large GPU clusters interconnected via these high-speed communication protocols."
+      },
+      {
+        "name": "Cluster Administration",
+        "description": "Deploying and administrating servers, switches, and related infrastructure for High-Performance Computing (HPC)."
+      }
+    ],
+    "inferred_domain": "High-Performance Computing (HPC) / GPU Clusters"
   }
 ]
