@@ -1,0 +1,114 @@
+[
+  {
+    "id": "nv-jr2014232",
+    "title": "DevOps and Build Engineer - Compiler",
+    "level": "mid",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/DevOps-and-Build-Engineer---Compiler_JR2014232",
+    "date_scraped": "2026-04-26",
+    "skills": [
+      {
+        "name": "CI/CD (GitLab, Jenkins)",
+        "description": "Used to develop and maintain robust pipelines ensuring flawless integration and delivery of compiler software."
+      },
+      {
+        "name": "Build Tools (CMake, Bazel, GNU Make)",
+        "description": "Essential for enhancing and maintaining the build infrastructure to deliver new libraries and executables for compiler features."
+      },
+      {
+        "name": "Docker & Kubernetes",
+        "description": "Implemented to manage containerization and orchestration, streamlining development workflows for the compiler team."
+      },
+      {
+        "name": "Python & Bash",
+        "description": "Utilized for scripting to diagnose and resolve complex issues, ensuring stability and performance of environments."
+      }
+    ],
+    "inferred_domain": "Compiler Technologies"
+  },
+  {
+    "id": "nv-jr2012804",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-26",
+    "skills": [
+      {
+        "name": "Kubernetes",
+        "description": "Requires advanced knowledge to manage large-scale production environments and orchestrate containerized applications."
+      },
+      {
+        "name": "Cloud Platforms (AWS, GCP, Azure, OCI)",
+        "description": "Used extensively to manage and deploy production environments across various cloud infrastructures."
+      },
+      {
+        "name": "Bash, Python, Go",
+        "description": "Applied for excellent scripting and software engineering capabilities in backend systems and databases."
+      },
+      {
+        "name": "Linux & Networking",
+        "description": "Fundamental for managing storage, security, and overall infrastructure in a large-scale software development setting."
+      }
+    ],
+    "inferred_domain": "Software Infrastructure and Operations"
+  },
+  {
+    "id": "nv-jr2011458",
+    "title": "Senior Site Reliability Engineer - Datacenter Automation",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
+    "date_scraped": "2026-04-26",
+    "skills": [
+      {
+        "name": "Cluster Management (Kubernetes, Slurm)",
+        "description": "Crucial for managing and automating large-scale distributed systems and scalable GPU clusters for AI workloads."
+      },
+      {
+        "name": "Systems Programming (Go, Python)",
+        "description": "Used to develop custom software related to GPU asset provisioning, configuration, and lifecycle management."
+      },
+      {
+        "name": "Observability & Telemetry",
+        "description": "Implemented to harness data streams from GPU hardware diagnostics to network telemetry, ensuring industry-leading reliability."
+      },
+      {
+        "name": "Incident Management",
+        "description": "Applied to evaluate system failures and improve services based on well-defined processes to maintain performant AI infrastructure."
+      }
+    ],
+    "inferred_domain": "DGX Cloud / Datacenter Automation"
+  },
+  {
+    "id": "nv-jr2012758",
+    "title": "Senior Site Reliability Engineer",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-Site-Reliability-Engineer_JR2012758",
+    "date_scraped": "2026-04-26",
+    "skills": [
+      {
+        "name": "CI/CD (Jenkins)",
+        "description": "Used for architecting, implementing, and supporting end-to-end CI/CD systems using open-source and NVIDIA proprietary software."
+      },
+      {
+        "name": "Infrastructure Automation (Ansible, Chef, Puppet)",
+        "description": "Leveraged to design and implement complex automation platforms that identify and resolve operational inefficiencies."
+      },
+      {
+        "name": "Containerization (Kubernetes, Docker)",
+        "description": "Hands-on application for deploying and monitoring critical high-performance, large-scale services on geo-distributed systems."
+      },
+      {
+        "name": "Data Analysis & Monitoring",
+        "description": "Involves mining data from multiple sources to identify scaling opportunities and building regression detection systems."
+      }
+    ],
+    "inferred_domain": "Core Infrastructure / Geo-distributed Systems"
+  }
+]

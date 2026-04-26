@@ -9,25 +9,25 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Kubernetes & Docker",
-        "description": "Used for containerization and orchestration of large-scale hybrid cloud systems that host NVIDIA's in-house CI offerings across heterogeneous devices."
+        "name": "CI/CD (Jenkins)",
+        "description": "Used for architecting, implementing, and supporting end-to-end CI/CD systems using open-source and NVIDIA proprietary software."
       },
       {
-        "name": "Ansible, Chef, Puppet",
-        "description": "Required for infrastructure automation to identify and resolve operational inefficiencies within complex deployment platforms."
+        "name": "Infrastructure Automation (Ansible, Chef, Puppet)",
+        "description": "Leveraged to design and implement complex automation platforms that identify and resolve operational inefficiencies."
       },
       {
-        "name": "Jenkins & CI/CD",
-        "description": "Essential for architecting, implementing, and supporting resilient, end-to-end CI/CD pipelines using both open-source and NVIDIA proprietary software."
+        "name": "Containerization (Kubernetes, Docker)",
+        "description": "Hands-on application for deploying and monitoring critical high-performance, large-scale services on geo-distributed systems."
       },
       {
-        "name": "Monitoring (Prometheus, Grafana, ELK)",
-        "description": "Used to monitor critical high-performance, geo-distributed services and mine data to identify scaling and optimization opportunities."
+        "name": "Data Analysis & Monitoring",
+        "description": "Involves mining data from multiple sources to identify scaling opportunities and building regression detection systems."
       }
     ],
     "inferred_domain": "CI Infrastructure / Hybrid Cloud",
     "first_seen": "2026-04-25",
-    "last_seen": "2026-04-25"
+    "last_seen": "2026-04-26"
   },
   {
     "id": "c4d9f0a2",
@@ -65,21 +65,25 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Kubernetes & containerd",
-        "description": "Used to deploy and support end-to-end container management solutions for large scalable GPU clusters within the DGX Cloud."
+        "name": "Cluster Management (Kubernetes, Slurm)",
+        "description": "Crucial for managing and automating large-scale distributed systems and scalable GPU clusters for AI workloads."
       },
       {
-        "name": "Python, Golang, Java",
-        "description": "Required for programming sophisticated automations and AI-powered applications to maintain a massive infrastructure of 35,000+ hosts with minimal manual intervention."
+        "name": "Systems Programming (Go, Python)",
+        "description": "Used to develop custom software related to GPU asset provisioning, configuration, and lifecycle management."
       },
       {
-        "name": "Slurm & Open Stack",
-        "description": "Used for maintaining and scaling large on-premises cloud infrastructure applications and compute environments."
+        "name": "Observability & Telemetry",
+        "description": "Implemented to harness data streams from GPU hardware diagnostics to network telemetry, ensuring industry-leading reliability."
+      },
+      {
+        "name": "Incident Management",
+        "description": "Applied to evaluate system failures and improve services based on well-defined processes to maintain performant AI infrastructure."
       }
     ],
     "inferred_domain": "DGX Cloud / AI Infrastructure",
     "first_seen": "2026-04-25",
-    "last_seen": "2026-04-25"
+    "last_seen": "2026-04-26"
   },
   {
     "id": "f2a5d8c9",
@@ -91,21 +95,25 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Kubernetes & Docker",
-        "description": "Used to design, implement, and maintain database-centric microservice architectures for manufacturing information systems."
+        "name": "Kubernetes",
+        "description": "Requires advanced knowledge to manage large-scale production environments and orchestrate containerized applications."
       },
       {
-        "name": "Cloud Platforms (AWS, Azure, GCP)",
-        "description": "Required for automating infrastructure provisioning and configuration management using modern cloud technologies."
+        "name": "Cloud Platforms (AWS, GCP, Azure, OCI)",
+        "description": "Used extensively to manage and deploy production environments across various cloud infrastructures."
       },
       {
-        "name": "Database Technologies",
-        "description": "Used to implement and manage database solutions, ensuring high performance, scalability, and reliability for data analysis solutions."
+        "name": "Bash, Python, Go",
+        "description": "Applied for excellent scripting and software engineering capabilities in backend systems and databases."
+      },
+      {
+        "name": "Linux & Networking",
+        "description": "Fundamental for managing storage, security, and overall infrastructure in a large-scale software development setting."
       }
     ],
     "inferred_domain": "Manufacturing Information Systems",
     "first_seen": "2026-04-25",
-    "last_seen": "2026-04-25"
+    "last_seen": "2026-04-26"
   },
   {
     "id": "b6e3a1f4",
@@ -117,20 +125,24 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "Build Tools (CMake, Bazel, GNU Make)",
-        "description": "Crucial for compiling and maintaining the build infrastructure for next-generation GPU compiler technologies used in deep learning and gaming."
+        "name": "CI/CD (GitLab, Jenkins)",
+        "description": "Used to develop and maintain robust pipelines ensuring flawless integration and delivery of compiler software."
       },
       {
-        "name": "Jenkins (Groovy) & GitLab CI/CD",
-        "description": "Used to develop and maintain robust CI/CD pipelines to ensure flawless integration and delivery of compiler software libraries and executables."
+        "name": "Build Tools (CMake, Bazel, GNU Make)",
+        "description": "Essential for enhancing and maintaining the build infrastructure to deliver new libraries and executables for compiler features."
       },
       {
         "name": "Docker & Kubernetes",
-        "description": "Implemented to manage containerization and orchestration tools to streamline development workflows for the compiler engineering team."
+        "description": "Implemented to manage containerization and orchestration, streamlining development workflows for the compiler team."
+      },
+      {
+        "name": "Python & Bash",
+        "description": "Utilized for scripting to diagnose and resolve complex issues, ensuring stability and performance of environments."
       }
     ],
     "inferred_domain": "Compiler Technologies / AI Tools",
     "first_seen": "2026-04-25",
-    "last_seen": "2026-04-25"
+    "last_seen": "2026-04-26"
   }
 ]
