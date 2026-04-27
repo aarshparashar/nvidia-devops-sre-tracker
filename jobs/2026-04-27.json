@@ -1,0 +1,90 @@
+[
+  {
+    "id": "a1b2c3d4",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-27",
+    "skills": [
+      {
+        "name": "Kubernetes",
+        "description": "Used for container orchestration and deploying critical high-performance, large-scale services running on geo-distributed systems."
+      },
+      {
+        "name": "Jenkins",
+        "description": "Required for architecting, implementing, and supporting end-to-end CI/CD systems using open-source and NVIDIA proprietary software."
+      },
+      {
+        "name": "Ansible / Chef / Puppet",
+        "description": "Utilized for infrastructure automation to identify and resolve operational inefficiencies across a heterogeneous mix of machines."
+      }
+    ],
+    "inferred_domain": "Infrastructure, Planning and Process (IPP) / Core Systems"
+  },
+  {
+    "id": "e5f6g7h8",
+    "title": "DevOps Engineer, DFX Software",
+    "level": "mid",
+    "category": "DevOps",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/DevOps-Engineer--DFX-Software_JR2016127",
+    "date_scraped": "2026-04-27",
+    "skills": [
+      {
+        "name": "Jenkins / GitLab",
+        "description": "Employed as CI/CD tools to orchestrate the process of Software Quality for CAD tools and flows."
+      },
+      {
+        "name": "Python / Tcl / C++",
+        "description": "Used for scripting and programming to develop test reporting mechanisms and in-house tools in the area of Design for Test (DFT)."
+      },
+      {
+        "name": "CMake / Meson",
+        "description": "Applied as build systems for software configuration and maintaining regression testing frameworks."
+      }
+    ],
+    "inferred_domain": "Semiconductor Design / CAD Tools / Software Quality Assurance"
+  },
+  {
+    "id": "i9j0k1l2",
+    "title": "DevOps and Build Engineer - Compiler",
+    "level": "mid",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/DevOps-and-Build-Engineer---Compiler_JR2014232",
+    "date_scraped": "2026-04-27",
+    "skills": [
+      {
+        "name": "CI/CD",
+        "description": "Essential for building and maintaining automated pipelines specifically tailored for compiler software development."
+      },
+      {
+        "name": "Infrastructure Automation",
+        "description": "Required to manage and scale the build infrastructure supporting the compiler engineering teams."
+      }
+    ],
+    "inferred_domain": "Compiler Infrastructure / Core Systems"
+  },
+  {
+    "id": "m3n4o5p6",
+    "title": "Senior Site Reliability Engineer",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Pune/Senior-Site-Reliability-Engineer_JR2012758",
+    "date_scraped": "2026-04-27",
+    "skills": [
+      {
+        "name": "Cloud Infrastructure",
+        "description": "Managing and scaling cloud environments to ensure high availability and reliability of NVIDIA's internal and external services."
+      },
+      {
+        "name": "CI/CD & Automation",
+        "description": "Enhancing deployment pipelines and automating operational tasks to minimize downtime and improve system resilience."
+      }
+    ],
+    "inferred_domain": "AI Infrastructure / Core Systems"
+  }
+]

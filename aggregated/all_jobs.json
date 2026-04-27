@@ -9,25 +9,17 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "CI/CD (Jenkins)",
-        "description": "Used for architecting, implementing, and supporting end-to-end CI/CD systems using open-source and NVIDIA proprietary software."
+        "name": "Cloud Infrastructure",
+        "description": "Managing and scaling cloud environments to ensure high availability and reliability of NVIDIA's internal and external services."
       },
       {
-        "name": "Infrastructure Automation (Ansible, Chef, Puppet)",
-        "description": "Leveraged to design and implement complex automation platforms that identify and resolve operational inefficiencies."
-      },
-      {
-        "name": "Containerization (Kubernetes, Docker)",
-        "description": "Hands-on application for deploying and monitoring critical high-performance, large-scale services on geo-distributed systems."
-      },
-      {
-        "name": "Data Analysis & Monitoring",
-        "description": "Involves mining data from multiple sources to identify scaling opportunities and building regression detection systems."
+        "name": "CI/CD & Automation",
+        "description": "Enhancing deployment pipelines and automating operational tasks to minimize downtime and improve system resilience."
       }
     ],
     "inferred_domain": "CI Infrastructure / Hybrid Cloud",
     "first_seen": "2026-04-25",
-    "last_seen": "2026-04-26"
+    "last_seen": "2026-04-27"
   },
   {
     "id": "c4d9f0a2",
@@ -96,24 +88,20 @@
     "skills": [
       {
         "name": "Kubernetes",
-        "description": "Requires advanced knowledge to manage large-scale production environments and orchestrate containerized applications."
+        "description": "Used for container orchestration and deploying critical high-performance, large-scale services running on geo-distributed systems."
       },
       {
-        "name": "Cloud Platforms (AWS, GCP, Azure, OCI)",
-        "description": "Used extensively to manage and deploy production environments across various cloud infrastructures."
+        "name": "Jenkins",
+        "description": "Required for architecting, implementing, and supporting end-to-end CI/CD systems using open-source and NVIDIA proprietary software."
       },
       {
-        "name": "Bash, Python, Go",
-        "description": "Applied for excellent scripting and software engineering capabilities in backend systems and databases."
-      },
-      {
-        "name": "Linux & Networking",
-        "description": "Fundamental for managing storage, security, and overall infrastructure in a large-scale software development setting."
+        "name": "Ansible / Chef / Puppet",
+        "description": "Utilized for infrastructure automation to identify and resolve operational inefficiencies across a heterogeneous mix of machines."
       }
     ],
     "inferred_domain": "Manufacturing Information Systems",
     "first_seen": "2026-04-25",
-    "last_seen": "2026-04-26"
+    "last_seen": "2026-04-27"
   },
   {
     "id": "b6e3a1f4",
@@ -125,24 +113,42 @@
     "date_scraped": "2026-04-25",
     "skills": [
       {
-        "name": "CI/CD (GitLab, Jenkins)",
-        "description": "Used to develop and maintain robust pipelines ensuring flawless integration and delivery of compiler software."
+        "name": "CI/CD",
+        "description": "Essential for building and maintaining automated pipelines specifically tailored for compiler software development."
       },
       {
-        "name": "Build Tools (CMake, Bazel, GNU Make)",
-        "description": "Essential for enhancing and maintaining the build infrastructure to deliver new libraries and executables for compiler features."
-      },
-      {
-        "name": "Docker & Kubernetes",
-        "description": "Implemented to manage containerization and orchestration, streamlining development workflows for the compiler team."
-      },
-      {
-        "name": "Python & Bash",
-        "description": "Utilized for scripting to diagnose and resolve complex issues, ensuring stability and performance of environments."
+        "name": "Infrastructure Automation",
+        "description": "Required to manage and scale the build infrastructure supporting the compiler engineering teams."
       }
     ],
     "inferred_domain": "Compiler Technologies / AI Tools",
     "first_seen": "2026-04-25",
-    "last_seen": "2026-04-26"
+    "last_seen": "2026-04-27"
+  },
+  {
+    "id": "e5f6g7h8",
+    "title": "DevOps Engineer, DFX Software",
+    "level": "mid",
+    "category": "DevOps",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite/job/India-Bengaluru/DevOps-Engineer--DFX-Software_JR2016127",
+    "date_scraped": "2026-04-27",
+    "skills": [
+      {
+        "name": "Jenkins / GitLab",
+        "description": "Employed as CI/CD tools to orchestrate the process of Software Quality for CAD tools and flows."
+      },
+      {
+        "name": "Python / Tcl / C++",
+        "description": "Used for scripting and programming to develop test reporting mechanisms and in-house tools in the area of Design for Test (DFT)."
+      },
+      {
+        "name": "CMake / Meson",
+        "description": "Applied as build systems for software configuration and maintaining regression testing frameworks."
+      }
+    ],
+    "inferred_domain": "Semiconductor Design / CAD Tools / Software Quality Assurance",
+    "first_seen": "2026-04-27",
+    "last_seen": "2026-04-27"
   }
 ]
