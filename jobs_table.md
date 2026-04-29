@@ -1,6 +1,7 @@
 # NVIDIA SRE & DevOps Tracker (India)
 *Powered by Gemini 3.1 Pro Preview + Live Search Grounding*
-*Last Updated: 2026-04-27*
+*Last Updated: 2026-04-29*
+*Run note: The model returned no text; table from `aggregated/all_jobs.json` only.*
 
 | Title | Level | Core Skills | Location | Link |
 |---|---|---|---|---|
