@@ -150,5 +150,101 @@
     "inferred_domain": "Semiconductor Design / CAD Tools / Software Quality Assurance",
     "first_seen": "2026-04-27",
     "last_seen": "2026-04-27"
+  },
+  {
+    "id": "a1b2c3d4",
+    "title": "Senior DevOps Engineer",
+    "level": "senior",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/Senior-DevOps-Engineer_JR2012804",
+    "date_scraped": "2026-04-30",
+    "skills": [
+      {
+        "name": "C++/Python/TCL",
+        "description": "Used for supporting the development of tools and automating software quality processes for hardware design flows."
+      },
+      {
+        "name": "CI/CD & Static Analysis",
+        "description": "Required for continuously delivering high-quality, bug-free software applications and maintaining regression testing frameworks."
+      }
+    ],
+    "inferred_domain": "DFX Software / Chip Design Validation",
+    "first_seen": "2026-04-30",
+    "last_seen": "2026-04-30"
+  },
+  {
+    "id": "e5f6g7h8",
+    "title": "DevOps and Build Engineer - Compiler",
+    "level": "mid",
+    "category": "DevOps",
+    "location": "Pune, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Pune/DevOps-and-Build-Engineer---Compiler_JR2014232",
+    "date_scraped": "2026-04-30",
+    "skills": [
+      {
+        "name": "Docker & Kubernetes",
+        "description": "Implemented to manage containerization and orchestration, streamlining development workflows for compiler technologies."
+      },
+      {
+        "name": "Jenkins & GitLab CI/CD",
+        "description": "Used to develop and maintain robust CI/CD pipelines ensuring flawless integration and delivery of compiler software."
+      },
+      {
+        "name": "GNU Make, CMake, Bazel",
+        "description": "Essential build tools utilized for compiling system software for NVIDIA processors."
+      }
+    ],
+    "inferred_domain": "Compiler Infrastructure",
+    "first_seen": "2026-04-30",
+    "last_seen": "2026-04-30"
+  },
+  {
+    "id": "i9j0k1l2",
+    "title": "Senior Site Reliability Engineer - Datacenter Automation",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Site-Reliability-Engineer---Datacenter-Automation_JR2011458",
+    "date_scraped": "2026-04-30",
+    "skills": [
+      {
+        "name": "Go & Python",
+        "description": "Systems programming languages used to automate deployments and eliminate toil in large-scale production systems."
+      },
+      {
+        "name": "Incident Management & Observability",
+        "description": "Applied for production system monitoring, alerting, and reliability assessments to scale up AI Infrastructure."
+      }
+    ],
+    "inferred_domain": "AI Infrastructure / Datacenter Automation",
+    "first_seen": "2026-04-30",
+    "last_seen": "2026-04-30"
+  },
+  {
+    "id": "m3n4o5p6",
+    "title": "Senior Network Site Reliability Engineer",
+    "level": "senior",
+    "category": "SRE",
+    "location": "Bengaluru, India",
+    "link": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/India-Bengaluru/Senior-Network-Site-Reliability-Engineer_JR2014533",
+    "date_scraped": "2026-04-30",
+    "skills": [
+      {
+        "name": "Prometheus & Grafana",
+        "description": "Network management and observability tools used to monitor network infrastructure and achieve Service Level Objectives (SLOs)."
+      },
+      {
+        "name": "Salt & Ansible",
+        "description": "Automation frameworks utilized to minimize manual labor and proactively mitigate network risks."
+      },
+      {
+        "name": "Python & Go",
+        "description": "Programming languages leveraged for network automation, operations, and developing custom reliability tooling."
+      }
+    ],
+    "inferred_domain": "Enterprise Network Infrastructure",
+    "first_seen": "2026-04-30",
+    "last_seen": "2026-04-30"
   }
 ]
